@@ -9,6 +9,7 @@ class GoogleDrive {
   }
 
   async setAuth() {
+    console.log('About to call Set Auth');
     await promisify(this.doc.useServiceAccountAuth)({
       type: keys.type,
       project_id: keys.project_id,
@@ -34,7 +35,7 @@ class GoogleDrive {
       limit: 10,
       orderby: 'date'
     });
-
+    console.log('About to call Rows');
     const jobs = rows.map(({ id, date, location, imageurl }) => {
       return { id, date, location, imageurl };
     });

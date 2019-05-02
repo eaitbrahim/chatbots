@@ -16,6 +16,7 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "google-spreadsheet": "^2.0.7",
     "lodash": "^4.17.11",
     "path-parser": "^2.0.2"
   },

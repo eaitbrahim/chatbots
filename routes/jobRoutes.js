@@ -19,7 +19,6 @@ module.exports = app => {
       const jobDetail = await googleDrive.getJobDetail(req.params.jobId);
 
       if (jobDetail.length == 0 || jobDetail[0].title == '') {
-        console.log('job detail:', noJobDetail);
         res.set('Content-Type', 'text/html');
         res.send(Buffer.from(noJobDetail));
       } else {

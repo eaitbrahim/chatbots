@@ -21,7 +21,7 @@ class GoogleDrive {
       auth_provider_x509_cert_url: keys.auth_provider_x509_cert_url,
       client_x509_cert_url: keys.client_x509_cert_url
     };
-
+    console.log('creds: ', creds);
     await promisify(this.doc.useServiceAccountAuth)(creds);
   }
 

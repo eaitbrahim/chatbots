@@ -9,6 +9,7 @@ class GoogleDrive {
   }
 
   async getJobs() {
+    console.log('creds: ', keys.googleSheetsCredsJson);
     await promisify(this.doc.useServiceAccountAuth)(keys.googleSheetsCredsJson);
 
     const sheetInfo = await promisify(this.doc.getInfo)();

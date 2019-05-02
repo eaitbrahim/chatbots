@@ -8,6 +8,14 @@ class GoogleDrive {
     this.doc = new GoogleSpreadsheet(spreadsheetKey);
   }
 
+  async setAuth() {
+    await promisify(this.doc.useServiceAccountAuth)(keys.googleSheetsCredsJson);
+  }
+
+  async getInfo() {
+    return await promisify(this.doc.getInfo)();
+  }
+
   async getJobs() {
     await promisify(this.doc.useServiceAccountAuth)(keys.googleSheetsCredsJson);
 

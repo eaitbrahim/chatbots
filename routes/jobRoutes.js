@@ -25,6 +25,8 @@ module.exports = app => {
 
   app.get('/api/test', async (req, res) => {
     const googleDrive = new GoogleDrive(keys.jobsSheetId);
-    res.send(googleDrive);
+    await googleDrive.setAuth();
+    const info = await googleDrive.getInfo();
+    res.send(info);
   });
 };

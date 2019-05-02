@@ -8,7 +8,7 @@ class GoogleDrive {
     this.doc = new GoogleSpreadsheet(keys.jobsSheetId);
   }
 
-  async getJobs() {
+  async setAuth() {
     await promisify(this.doc.useServiceAccountAuth)({
       type: keys.type,
       project_id: keys.project_id,
@@ -21,6 +21,10 @@ class GoogleDrive {
       auth_provider_x509_cert_url: keys.auth_provider_x509_cert_url,
       client_x509_cert_url: keys.client_x509_cert_url
     });
+  }
+
+  async getJobs() {
+    await this.setAuth();
 
     const sheetInfo = await promisify(this.doc.getInfo)();
     const sheet = sheetInfo.worksheets[0];
@@ -35,6 +39,23 @@ class GoogleDrive {
       return { id, date, location, imageurl };
     });
     return jobs;
+  }
+
+  async getJobDetail(jobId) {
+    await this.setAuth();
+
+    const sheetInfo = await promisify(this.doc.getInfo)();
+    const sheet = sheetInfo.worksheets[0];
+    const rows = await promisify(sheet.getRows)({
+      query: `id = ${jobId}`,
+      offset: 1,
+      limit: 1
+    });
+
+    const jobDetail = rows.map(({ title, position, requiredprofile }) => {
+      return { title, position, requiredprofile };
+    });
+    return jobDetail;
   }
 }
 

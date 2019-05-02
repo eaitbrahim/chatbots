@@ -8,27 +8,8 @@ class GoogleDrive {
     this.doc = new GoogleSpreadsheet(spreadsheetKey);
   }
 
-  async setAuth() {
-    const creds = {
-      type: keys.type,
-      project_id: keys.project_id,
-      private_key_id: keys.private_key_id,
-      private_key: keys.private_key,
-      client_email: keys.client_email,
-      client_id: keys.client_id,
-      auth_uri: keys.auth_uri,
-      token_uri: keys.token_uri,
-      auth_provider_x509_cert_url: keys.auth_provider_x509_cert_url,
-      client_x509_cert_url: keys.client_x509_cert_url
-    };
-
-    await promisify(this.doc.useServiceAccountAuth)(creds)
-      .then(r => console.log('result of auth:', r))
-      .catch(err => console.log('error of auth: ', err));
-  }
-
   async getJobs() {
-    await this.setAuth();
+    await promisify(this.doc.useServiceAccountAuth)(keys.googleSheetsCredsJson);
 
     const sheetInfo = await promisify(this.doc.getInfo)();
     const sheet = sheetInfo.worksheets[0];
@@ -46,7 +27,7 @@ class GoogleDrive {
   }
 
   async getJobDetail(jobId) {
-    await this.setAuth();
+    await promisify(this.doc.useServiceAccountAuth)(keys.googleSheetsCredsJson);
 
     const sheetInfo = await promisify(this.doc.getInfo)();
     const sheet = sheetInfo.worksheets[0];

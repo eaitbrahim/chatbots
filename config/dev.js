@@ -1,16 +1,18 @@
 module.exports = {
-  type: 'service_account',
-  project_id: 'recruitment-239317',
-  private_key_id: 'dbe2d33a82635336fb8fc818246590a9e89c00d6',
-  private_key:
-    '-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDhrxbbgT6Xza6H\ngl4Y3SfvwskizE4BitkIi+5gbWICvbV6knEqIcqGZVQmCqVlCIXK5ABSrCxlSf8H\n4mKdaAxs3+gKRjthz46Z5QrqJoiTKBvcvSvHcx+1ectJmVzft+aKhuJaEs+KOlWN\nuj6y08oQ4pT9Yhic4NQe/J0qBcpMYjOueD1HMdonmCnIhtkkFsVAawqjzXxItFGi\nxqQ16J1hKTedtjbVdHKYo3N/bj/tOvYuEM0XFnomLNCGRpRBKLYI+0DEMllB2g7D\nMVBEaRggxqN0hHhY7EQZ+rS8RdBVxywjjS8UFsJ+gwDXZEPmvx3YcFfe0l23NgDV\nG0D3Mdg9AgMBAAECggEAAqCqR9tVntZ9LuSlN5tkbfbh3Y2/Ly/pswzPdWAq7//g\nF1z/evG0s9WqHXiOwsazhPBlkmxFZsTuGxwSnsnCzdhsPwTy9R34kJpZZ6W4a5Hp\nFf4+R7WYG70xUTEo9USSsGa0kHX7G0HcZlrtYAYjmBrOGsZqyiiEZXJkSDImRtu6\nY4TW5gfD9GQpRiyucWLjiuH+Dsq0WjfqLPpkiAb425cBoUZHtQ+5sIg3WMlPEMu3\nNwXAISBLbM/wUHllEDLmlnuekTk/L/YCLLWtAQeMvUepI/7H2cVmE+6mhTiLIdop\nsRCc/tliGoUqyLlR8Z7IBAIYHnylCmxq2t7QfcaneQKBgQDwxQbDrBIvJBZao0aE\nBLB2a8aWkIzMeXTyJHg5kW4Mx+W1OUkriCOEczLFWb+3q2CxnJTtSCTs7UwvOi+m\nQkyRD+jQ2NqYyOIEmnYvusypdGN5/0g5aok3TbUW07cufmyzAafMpycj6B/WxsUT\n3SYCeIbFIGtOcvIi6wYH9bGhCQKBgQDv9cSu6Rvc2uV7TRhYKtnmeGQ/ql5FN7oI\n1ohJmTPM7qurOrK3ABn0nTjV+aeh2iLUG3Jbe3P5DNpCz4xUsAqA1/rBZzGCscVS\nR1wYqxJCUw652emPckBaLQYLCaSARzE3Nrb1BD172PQecVrwypqbZ0GvBL7bJSY8\nva4N5kOulQKBgQC6dqxVb/apQZZ6XYboCUWsgK1Mv+f7F3klam8djm6fQVS59AKh\nzw5Krni8dFRQ5028X9rKpRvLzb85uCNc7G2lzp9s1vT8bF72V7V+I3oLJlNAER+b\nL9HS3cCITDDKtihyva55hV5/pW67BDduuc+NDFC7a+8O02CJAGEsWvBVGQKBgQDi\nlMQakRzxJ3THP9376sKEYCvw/fM0EtHEZKaeMF58ZOWOssdsC1l25Dp1ud5y8yIt\n/Ji4D1NL2LoDmi0dDnlsfgRWORXEHg5/ichJtsdv/zOJhF2JSM3BGIB7TaiaRB8R\nzsVliJJx7kNct5ayhe0FTrP0ClwZW/PGKSlAEKzaHQKBgQDqqGR4OFidR6FB4sCq\nD1YXkPGzQdnTLWfKbmldbFnFFhuEXmLjCTBcjjzZp82yyB8pz03PpQMPOlSiqGIi\nvbcmb/MJVT1SjQNKUyprB63dJUP+EJF78yyKHwcodWWdAasNHjm5N8JA1x52FPhQ\ntQvIoQ4mR9VuvP59Ga5mFnTDZQ==\n-----END PRIVATE KEY-----\n',
-  client_email: 'sheets@recruitment-239317.iam.gserviceaccount.com',
-  client_id: '102402800320818277113',
-  auth_uri: 'https://accounts.google.com/o/oauth2/auth',
-  token_uri: 'https://oauth2.googleapis.com/token',
-  auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-  client_x509_cert_url:
-    'https://www.googleapis.com/robot/v1/metadata/x509/sheets%40recruitment-239317.iam.gserviceaccount.com',
+  googleSheetsCredsJson: {
+    type: 'service_account',
+    project_id: 'recruitment-239317',
+    private_key_id: 'dbe2d33a82635336fb8fc818246590a9e89c00d6',
+    private_key:
+      '-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDhrxbbgT6Xza6H\ngl4Y3SfvwskizE4BitkIi+5gbWICvbV6knEqIcqGZVQmCqVlCIXK5ABSrCxlSf8H\n4mKdaAxs3+gKRjthz46Z5QrqJoiTKBvcvSvHcx+1ectJmVzft+aKhuJaEs+KOlWN\nuj6y08oQ4pT9Yhic4NQe/J0qBcpMYjOueD1HMdonmCnIhtkkFsVAawqjzXxItFGi\nxqQ16J1hKTedtjbVdHKYo3N/bj/tOvYuEM0XFnomLNCGRpRBKLYI+0DEMllB2g7D\nMVBEaRggxqN0hHhY7EQZ+rS8RdBVxywjjS8UFsJ+gwDXZEPmvx3YcFfe0l23NgDV\nG0D3Mdg9AgMBAAECggEAAqCqR9tVntZ9LuSlN5tkbfbh3Y2/Ly/pswzPdWAq7//g\nF1z/evG0s9WqHXiOwsazhPBlkmxFZsTuGxwSnsnCzdhsPwTy9R34kJpZZ6W4a5Hp\nFf4+R7WYG70xUTEo9USSsGa0kHX7G0HcZlrtYAYjmBrOGsZqyiiEZXJkSDImRtu6\nY4TW5gfD9GQpRiyucWLjiuH+Dsq0WjfqLPpkiAb425cBoUZHtQ+5sIg3WMlPEMu3\nNwXAISBLbM/wUHllEDLmlnuekTk/L/YCLLWtAQeMvUepI/7H2cVmE+6mhTiLIdop\nsRCc/tliGoUqyLlR8Z7IBAIYHnylCmxq2t7QfcaneQKBgQDwxQbDrBIvJBZao0aE\nBLB2a8aWkIzMeXTyJHg5kW4Mx+W1OUkriCOEczLFWb+3q2CxnJTtSCTs7UwvOi+m\nQkyRD+jQ2NqYyOIEmnYvusypdGN5/0g5aok3TbUW07cufmyzAafMpycj6B/WxsUT\n3SYCeIbFIGtOcvIi6wYH9bGhCQKBgQDv9cSu6Rvc2uV7TRhYKtnmeGQ/ql5FN7oI\n1ohJmTPM7qurOrK3ABn0nTjV+aeh2iLUG3Jbe3P5DNpCz4xUsAqA1/rBZzGCscVS\nR1wYqxJCUw652emPckBaLQYLCaSARzE3Nrb1BD172PQecVrwypqbZ0GvBL7bJSY8\nva4N5kOulQKBgQC6dqxVb/apQZZ6XYboCUWsgK1Mv+f7F3klam8djm6fQVS59AKh\nzw5Krni8dFRQ5028X9rKpRvLzb85uCNc7G2lzp9s1vT8bF72V7V+I3oLJlNAER+b\nL9HS3cCITDDKtihyva55hV5/pW67BDduuc+NDFC7a+8O02CJAGEsWvBVGQKBgQDi\nlMQakRzxJ3THP9376sKEYCvw/fM0EtHEZKaeMF58ZOWOssdsC1l25Dp1ud5y8yIt\n/Ji4D1NL2LoDmi0dDnlsfgRWORXEHg5/ichJtsdv/zOJhF2JSM3BGIB7TaiaRB8R\nzsVliJJx7kNct5ayhe0FTrP0ClwZW/PGKSlAEKzaHQKBgQDqqGR4OFidR6FB4sCq\nD1YXkPGzQdnTLWfKbmldbFnFFhuEXmLjCTBcjjzZp82yyB8pz03PpQMPOlSiqGIi\nvbcmb/MJVT1SjQNKUyprB63dJUP+EJF78yyKHwcodWWdAasNHjm5N8JA1x52FPhQ\ntQvIoQ4mR9VuvP59Ga5mFnTDZQ==\n-----END PRIVATE KEY-----\n',
+    client_email: 'sheets@recruitment-239317.iam.gserviceaccount.com',
+    client_id: '102402800320818277113',
+    auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+    token_uri: 'https://oauth2.googleapis.com/token',
+    auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+    client_x509_cert_url:
+      'https://www.googleapis.com/robot/v1/metadata/x509/sheets%40recruitment-239317.iam.gserviceaccount.com'
+  },
   jobsSheetId: '1BwuA-wWCL3Uqe4mDe8L9ZyplwuRzM_ueBrlkh6VnVgY',
   candidaturesSheetId: '1Ee8fKExMmEcAPDmvPl7mB7N_HtuaPepp1d6DHWVvOAc'
 };

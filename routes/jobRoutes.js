@@ -22,4 +22,8 @@ module.exports = app => {
       res.status(422).send(err);
     }
   });
+
+  app.get('/api/test', async (req, res) => {
+    res.send(keys.googleSheetsCredsJson);
+  });
 };

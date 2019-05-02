@@ -1,7 +1,6 @@
-const _ = require('lodash');
 const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
-const keys = require('../config/keys');
+const creds = require('../config/client_secret.json');
 
 class GoogleDrive {
   constructor(spreadsheetKey) {
@@ -9,7 +8,7 @@ class GoogleDrive {
   }
 
   async setAuth() {
-    await promisify(this.doc.useServiceAccountAuth)(keys.googleSheetsCredsJson);
+    await promisify(this.doc.useServiceAccountAuth)(creds);
   }
 
   async getInfo() {
@@ -17,7 +16,7 @@ class GoogleDrive {
   }
 
   async getJobs() {
-    await promisify(this.doc.useServiceAccountAuth)(keys.googleSheetsCredsJson);
+    await promisify(this.doc.useServiceAccountAuth)(creds);
 
     const sheetInfo = await promisify(this.doc.getInfo)();
     const sheet = sheetInfo.worksheets[0];
@@ -35,7 +34,7 @@ class GoogleDrive {
   }
 
   async getJobDetail(jobId) {
-    await promisify(this.doc.useServiceAccountAuth)(keys.googleSheetsCredsJson);
+    await promisify(this.doc.useServiceAccountAuth)(creds);
 
     const sheetInfo = await promisify(this.doc.getInfo)();
     const sheet = sheetInfo.worksheets[0];

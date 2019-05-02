@@ -10,7 +10,7 @@ class GoogleDrive {
 
   async setAuth() {
     console.log('About to call Set Auth');
-    await promisify(this.doc.useServiceAccountAuth)({
+    const creds = {
       type: keys.type,
       project_id: keys.project_id,
       private_key_id: keys.private_key_id,
@@ -21,7 +21,9 @@ class GoogleDrive {
       token_uri: keys.token_uri,
       auth_provider_x509_cert_url: keys.auth_provider_x509_cert_url,
       client_x509_cert_url: keys.client_x509_cert_url
-    });
+    };
+    console.log('creds: ', creds);
+    await promisify(this.doc.useServiceAccountAuth)(creds);
   }
 
   async getJobs() {

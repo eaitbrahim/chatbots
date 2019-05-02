@@ -3,7 +3,6 @@ const keys = require('../config/keys');
 
 module.exports = app => {
   app.get('/api/jobs', async (req, res) => {
-    console.log('sheet key: ', keys.jobsSheetId);
     const googleDrive = new GoogleDrive(keys.jobsSheetId);
     try {
       const jobs = await googleDrive.getJobs();
@@ -19,6 +18,7 @@ module.exports = app => {
       const jobDetail = await googleDrive.getJobDetail(req.params.jobId);
       res.send(jobDetail);
     } catch (err) {
+      console.log('error: ', err);
       res.status(422).send(err);
     }
   });

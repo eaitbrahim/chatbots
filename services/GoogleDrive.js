@@ -5,11 +5,10 @@ const keys = require('../config/keys');
 
 class GoogleDrive {
   constructor(spreadsheetKey) {
-    this.doc = new GoogleSpreadsheet(keys.jobsSheetId);
+    this.doc = new GoogleSpreadsheet(spreadsheetKey);
   }
 
   async setAuth() {
-    console.log('About to call Set Auth');
     const creds = {
       type: keys.type,
       project_id: keys.project_id,
@@ -22,7 +21,7 @@ class GoogleDrive {
       auth_provider_x509_cert_url: keys.auth_provider_x509_cert_url,
       client_x509_cert_url: keys.client_x509_cert_url
     };
-    console.log('creds: ', creds);
+
     await promisify(this.doc.useServiceAccountAuth)(creds);
   }
 
@@ -37,7 +36,7 @@ class GoogleDrive {
       limit: 10,
       orderby: 'date'
     });
-    console.log('About to call Rows');
+
     const jobs = rows.map(({ id, date, location, imageurl }) => {
       return { id, date, location, imageurl };
     });

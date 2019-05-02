@@ -22,20 +22,26 @@ class GoogleDrive {
       client_x509_cert_url: keys.client_x509_cert_url
     };
 
-    await promisify(this.doc.useServiceAccountAuth)(creds);
+    await promisify(this.doc.useServiceAccountAuth)(creds)
+      .then(r => console.log('result of auth:', r))
+      .catch(err => console.log('error of auth: ', err));
   }
 
   async getJobs() {
     await this.setAuth();
 
-    const sheetInfo = await promisify(this.doc.getInfo)();
+    const sheetInfo = await promisify(this.doc.getInfo)()
+      .then(r => console.log('result of info:', r))
+      .catch(err => console.log('error of info: ', err));
     const sheet = sheetInfo.worksheets[0];
     const rows = await promisify(sheet.getRows)({
       query: 'publish = yes',
       offset: 1,
       limit: 10,
       orderby: 'date'
-    });
+    })
+      .then(r => console.log('result of rows:', r))
+      .catch(err => console.log('error of rows: ', err));
 
     const jobs = rows.map(({ id, date, location, imageurl }) => {
       return { id, date, location, imageurl };

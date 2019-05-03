@@ -2,6 +2,8 @@ const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
 const creds = require('../config/client_secret.json');
 const noJobs = require('./jsonResponses/noJobs.json');
+const jobElement = require('./jsonResponses/jobElement.json');
+const jobsGallery = require('./jsonResponses/jobsGallery.json');
 
 class GoogleDrive {
   constructor(spreadsheetKey) {
@@ -16,7 +18,7 @@ class GoogleDrive {
     return await promisify(sheet.getRows)(queryObj);
   }
 
-  async getJobs() {
+  async getJobs(fullWebApiUrl) {
     const queryObj = {
       query: 'publish = yes',
       offset: 1,
@@ -24,14 +26,43 @@ class GoogleDrive {
       orderby: 'date'
     };
     const rows = await this.fetchData(queryObj);
-    console.log('rows', rows);
+
     if (rows.length == 0) {
       return noJobs;
     }
-    const jobs = rows.map(({ id, date, location, imageurl }) => {
-      return { id, date, location, imageurl };
+
+    const jobs = rows.map(({ id, title, date, location, imageurl }) => {
+      jobElement.title = title;
+      jobElement['image_url'] = imageurl;
+      jobElement.subtitle = location + ' - ' + date;
+      const buttons = [];
+      buttons.push({
+        type: 'web_url',
+        url: `${fullWebApiUrl}/api/jobs/${id}`,
+        title: 'Voir Détail',
+        messenger_extensions: true,
+        webview_height_ration: 'full'
+      });
+      buttons.push({
+        type: 'show_block',
+        set_attributes: {
+          job: id,
+          job_title: title
+        },
+        block_names: ['User Info'],
+        title: 'Postuler'
+      });
+      buttons.push({
+        type: 'element_share',
+        title: 'Partager'
+      });
+
+      jobElement.buttons = buttons;
+      return jobElement;
     });
-    return jobs;
+
+    jobsGallery.messages[0].attachment.payload.elements = jobs;
+    return jobsGallery;
   }
 
   async getJobDetail(jobId) {

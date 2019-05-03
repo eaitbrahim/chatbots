@@ -6,7 +6,8 @@ module.exports = app => {
   app.get('/api/jobs', async (req, res) => {
     const googleDrive = new GoogleDrive(keys.jobsSheetId);
     try {
-      const jobs = await googleDrive.getJobs();
+      const fullWebApiUrl = `${req.protocol}://${req.get('host')}`;
+      const jobs = await googleDrive.getJobs(fullWebApiUrl);
       res.send(jobs);
     } catch (err) {
       res.status(422).send(err);

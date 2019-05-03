@@ -8,7 +8,9 @@ module.exports = app => {
     try {
       const fullWebApiUrl = `${req.protocol}://${req.get('host')}`;
       const jobs = await googleDrive.getJobs(fullWebApiUrl);
+      res.set('Content-Type', 'application/json');
       res.send(jobs);
+      console.log('jobs: ', jobs);
     } catch (err) {
       res.status(422).send(err);
     }

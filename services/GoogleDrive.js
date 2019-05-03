@@ -1,8 +1,8 @@
+const _ = require('lodash');
 const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
 const creds = require('../config/client_secret.json');
 const noJobs = require('./jsonResponses/noJobs.json');
-const jobElement = require('./jsonResponses/jobElement.json');
 const jobsGallery = require('./jsonResponses/jobsGallery.json');
 
 class GoogleDrive {
@@ -31,10 +31,7 @@ class GoogleDrive {
       return noJobs;
     }
 
-    const jobs = rows.map(({ id, title, date, location, imageurl }) => {
-      jobElement.title = title;
-      jobElement['image_url'] = imageurl;
-      jobElement.subtitle = location + ' - ' + date;
+    const jobs = _.map(rows, ({ id, title, date, location, imageurl }) => {
       const buttons = [];
       buttons.push({
         type: 'web_url',
@@ -56,9 +53,12 @@ class GoogleDrive {
         type: 'element_share',
         title: 'Partager'
       });
-
-      jobElement.buttons = buttons;
-      return jobElement;
+      return {
+        title,
+        image_url: imageurl,
+        subtitle: location + ' - ' + date,
+        buttons: buttons
+      };
     });
 
     jobsGallery.messages[0].attachment.payload.elements = jobs;

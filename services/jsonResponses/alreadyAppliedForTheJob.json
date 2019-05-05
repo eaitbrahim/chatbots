@@ -1,0 +1,18 @@
+{
+  "messages": [
+    {
+      "text": "",
+      "quick_replies": [
+        {
+          "title": "Re-Postuler",
+          "block_names": ["Recapitulative"],
+          "set_attributes": {}
+        },
+        {
+          "title": "Ne pas postuler",
+          "block_names": ["Main Menu"]
+        }
+      ]
+    }
+  ]
+}

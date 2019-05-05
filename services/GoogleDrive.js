@@ -80,7 +80,7 @@ class GoogleDrive {
   }
 
   async checkCandidature(messengerId, jobId) {
-    const filteredRows = fetchCandidature(messengerId, jobId);
+    const filteredRows = await fetchCandidature(messengerId, jobId);
 
     if (filteredRows.length == 0) {
       if (jobId == 1) {
@@ -130,7 +130,7 @@ class GoogleDrive {
   }
 
   async submitCandidature(candidature) {
-    const candidature = fetchCandidature(messengerId, jobId);
+    const candidature = await fetchCandidature(messengerId, jobId);
     const row = {
       messengerId: candidature['messenger user id'],
       email: candidature.email,

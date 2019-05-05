@@ -21,6 +21,7 @@ module.exports = app => {
       const candidature = await googleDrive.submitCandidature(req.body);
       res.json(candidature);
     } catch (err) {
+      console.log('errors:', err);
       res.status(422).send(err);
     }
   });

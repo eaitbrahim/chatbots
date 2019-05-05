@@ -163,10 +163,12 @@ class GoogleDrive {
 
     if (candidature.length == 0) {
       await promisify(this.sheet.addRow)(row);
+      console.log('inserted');
       candidatureMsg.messages.text =
         'Votre candidature a été ajoutée à notre base de données.';
     } else {
       await promisify(this.sheet.updateRow)(row);
+      console.log('updated');
       candidatureMsg.messages.text =
         'Votre candidature a été mise à jour dans notre base de données.';
     }

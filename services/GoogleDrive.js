@@ -14,12 +14,10 @@ class GoogleDrive {
     this.doc = new GoogleSpreadsheet(spreadsheetKey);
   }
 
-  async fetchData(queryObj) {
+  async setSheet() {
     await promisify(this.doc.useServiceAccountAuth)(creds);
     const sheetInfo = await promisify(this.doc.getInfo)();
-    const sheet = sheetInfo.worksheets[0];
-
-    return await promisify(sheet.getRows)(queryObj);
+    this.sheet = sheetInfo.worksheets[0];
   }
 
   async getJobs(fullWebApiUrl, forModification = false) {
@@ -27,7 +25,8 @@ class GoogleDrive {
       query: 'publish = yes',
       offset: 1
     };
-    const rows = await this.fetchData(queryObj);
+    await this.setSheet();
+    const rows = await promisify(this.sheet.getRows)(queryObj);
 
     if (rows.length == 0) {
       return noJobs;
@@ -63,7 +62,8 @@ class GoogleDrive {
       offset: 1,
       limit: 1
     };
-    const rows = await this.fetchData(queryObj);
+    await this.setSheet();
+    const rows = await promisify(this.sheet.getRows)(queryObj);
 
     if (rows.length == 0 || rows[0].title == '') {
       return noJobDetailTemplate;
@@ -80,14 +80,7 @@ class GoogleDrive {
   }
 
   async checkCandidature(messengerId, jobId) {
-    const queryObj = {
-      query: `messengerid = ${messengerId}`,
-      offset: 1
-    };
-    const rows = await this.fetchData(queryObj);
-    const filteredRows = _.filter(rows, ({ jobid }) => {
-      return jobid == jobId;
-    });
+    const filteredRows = fetchCandidature(messengerId, jobId);
 
     if (filteredRows.length == 0) {
       if (jobId == 1) {
@@ -118,7 +111,7 @@ class GoogleDrive {
       italian: filteredRows[0].italianlevel,
       german: filteredRows[0].germanlevel,
       language1: filteredRows[0].language1,
-      language1_level: filteredRows[0].language2level,
+      language1_level: filteredRows[0].language1level,
       language2: filteredRows[0].language2,
       language2_level: filteredRows[0].language2level,
       language3: filteredRows[0].language3,
@@ -136,7 +129,66 @@ class GoogleDrive {
     return alreadyAppliedForTheJob;
   }
 
-  async submitCandidature() {}
+  async submitCandidature(candidature) {
+    const candidature = fetchCandidature(messengerId, jobId);
+    const row = {
+      messengerId: candidature['messenger user id'],
+      email: candidature.email,
+      phone: candidature.phone,
+      yearsofexperience: candidature.experience,
+      similarexperience: candidature.same_experience,
+      workedatmajorel: candidature.worked_in_majorel,
+      location: candidature.city,
+      englishlevel: candidature.english,
+      dutchlevel: candidature.irish,
+      spanishlevel: candidature.spanish,
+      italianlevel: candidature.italian,
+      germanlevel: candidature.german,
+      language1: candidature.language1,
+      language1level: candidature.language1_level,
+      language2: candidature.language2,
+      language2level: candidature.language2_level,
+      language3: candidature.language3,
+      language3level: candidature.language3_level,
+      cv: candidature.cv,
+      motivations: candidature.motivations,
+      expectations: candidature.expectations,
+      journey: candidature.journey,
+      jobid: candidature.job,
+      jobtitle: candidature.job_title,
+      firstname: candidature.first_name,
+      lastname: candidature.last_name
+    };
+
+    await this.setSheet();
+    const msg = '';
+    if (candidature.length == 0) {
+      await promisify(this.sheet.addRow)(row);
+      msg = 'Votre candidature a été ajoutée à notre base de données.';
+    } else {
+      await promisify(this.sheet.updateRow)(row);
+      msg = 'Votre candidature a été mise à jour dans notre base de données.';
+    }
+
+    return {
+      set_attributes: {
+        gSheetMsg: 'some value'
+      }
+    };
+  }
+
+  async fetchCandidature(messengerId, jobId) {
+    const queryObj = {
+      query: `messengerid = ${messengerId}`,
+      offset: 1
+    };
+    await this.setSheet();
+    const rows = await promisify(this.sheet.getRows)(queryObj);
+    const filteredRows = _.filter(rows, ({ jobid }) => {
+      return jobid == jobId;
+    });
+    return filteredRows;
+  }
 
   constructButtons(constructedUrl, jobId, jobTitle, forModification) {
     const buttons = [];

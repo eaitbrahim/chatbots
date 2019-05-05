@@ -17,9 +17,8 @@ module.exports = app => {
 
   app.post('/api/candidature', async (req, res) => {
     const googleDrive = new GoogleDrive(keys.candidaturesSheetId);
-    console.log('body: ', req.body);
     try {
-      const candidature = await googleDrive.submitCandidature({ ...req.body });
+      const candidature = await googleDrive.submitCandidature(req.body);
       res.json(candidature);
     } catch (err) {
       res.status(422).send(err);

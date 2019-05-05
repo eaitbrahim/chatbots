@@ -1,5 +1,7 @@
 {
-  "set_attributes": {
-    "sgSheetMsg": ""
-  }
+  "messages": [
+    {
+      "text": ""
+    }
+  ]
 }

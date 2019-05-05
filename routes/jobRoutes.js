@@ -20,7 +20,6 @@ module.exports = app => {
     const googleDrive = new GoogleDrive(keys.jobsSheetId);
     try {
       const jobDetail = await googleDrive.getJobDetail(req.params.jobId);
-      console.log('jobDetail: ', jobDetail);
       res.set('Content-Type', 'text/html');
       res.send(jobDetail);
     } catch (err) {

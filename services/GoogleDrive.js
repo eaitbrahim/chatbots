@@ -22,7 +22,7 @@ class GoogleDrive {
     return await promisify(sheet.getRows)(queryObj);
   }
 
-  async getJobs(fullWebApiUrl) {
+  async getJobs(fullWebApiUrl, forModification = false) {
     const queryObj = {
       query: 'publish = yes',
       offset: 1
@@ -32,37 +32,23 @@ class GoogleDrive {
     if (rows.length == 0) {
       return noJobs;
     }
-
     const jobs = _.chain(rows)
       .orderBy(['date'], ['desc'])
       .take(10)
       .map(({ id, title, date, location, imageurl }) => {
-        const buttons = [];
-        buttons.push({
-          type: 'web_url',
-          url: `${fullWebApiUrl}/api/jobs/${id}`,
-          title: 'Voir Détail',
-          messenger_extensions: true,
-          webview_height_ration: 'full'
-        });
-        buttons.push({
-          type: 'show_block',
-          set_attributes: {
-            job: id,
-            job_title: title
-          },
-          block_names: ['User Info'],
-          title: 'Postuler'
-        });
-        buttons.push({
-          type: 'element_share',
-          title: 'Partager'
-        });
+        const constructedUrl = `${fullWebApiUrl}/api/jobs/${id}`;
+        const constructedButtons = this.constructButtons(
+          constructedUrl,
+          id,
+          title,
+          forModification
+        );
+
         return {
           title,
           image_url: imageurl,
           subtitle: location + ' - ' + date,
-          buttons: buttons
+          buttons: constructedButtons
         };
       })
       .value();
@@ -148,6 +134,43 @@ class GoogleDrive {
     };
 
     return alreadyAppliedForTheJob;
+  }
+
+  constructButtons(constructedUrl, jobId, jobTitle, forModification) {
+    const buttons = [];
+    buttons.push({
+      type: 'web_url',
+      url: constructedUrl,
+      title: 'Voir Détail',
+      messenger_extensions: true,
+      webview_height_ration: 'full'
+    });
+    if (forModification) {
+      buttons.push({
+        type: 'show_block',
+        set_attributes: {
+          job: jobId,
+          job_title: jobTitle
+        },
+        block_names: ['User Info'],
+        title: 'Postuler'
+      });
+      buttons.push({
+        type: 'element_share',
+        title: 'Partager'
+      });
+    } else {
+      buttons.push({
+        type: 'show_block',
+        set_attributes: {
+          job: jobId,
+          job_title: jobTitle
+        },
+        block_names: ['Recapitulative'],
+        title: 'Sélectionner'
+      });
+    }
+    return buttons;
   }
 }
 

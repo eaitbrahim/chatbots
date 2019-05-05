@@ -1,15 +1,27 @@
 const GoogleDrive = require('../services/GoogleDrive');
 const keys = require('../config/keys');
 
+getJobs = async (host, forModification = false) => {
+  const googleDrive = new GoogleDrive(keys.jobsSheetId);
+  const fullWebApiUrl = `${
+    host.includes('localhost') ? 'http' : 'https'
+  }://${host}`;
+  return await googleDrive.getJobs(fullWebApiUrl, forModification);
+};
+
 module.exports = app => {
-  app.get('/api/jobs', async (req, res) => {
-    const googleDrive = new GoogleDrive(keys.jobsSheetId);
+  app.get('/api/jobs/toApplyfor', async (req, res) => {
     try {
-      const host = req.get('host');
-      const fullWebApiUrl = `${
-        host != 'localhost' ? 'https' : req.protocol
-      }://${host}`;
-      const jobs = await googleDrive.getJobs(fullWebApiUrl);
+      const jobs = await getJobs(req.get('host'));
+      res.json(jobs);
+    } catch (err) {
+      res.status(422).send(err);
+    }
+  });
+
+  app.get('/api/jobs/forModification', async (req, res) => {
+    try {
+      const jobs = await getJobs(req.get('host'), true);
       res.json(jobs);
     } catch (err) {
       res.status(422).send(err);

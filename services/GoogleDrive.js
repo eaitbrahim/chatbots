@@ -4,6 +4,8 @@ const { promisify } = require('util');
 const creds = require('../config/client_secret.json');
 const noJobs = require('./jsonResponses/noJobs.json');
 const jobsGallery = require('./jsonResponses/jobsGallery.json');
+const noJobDetailTemplate = require('../services/htmlResponses/noJobDetailTemplate');
+const jobDetailTemplate = require('../services/htmlResponses/jobDetailTemplate');
 
 class GoogleDrive {
   constructor(spreadsheetKey) {
@@ -73,11 +75,18 @@ class GoogleDrive {
     };
     const rows = await this.fetchData(queryObj);
 
-    const jobDetail = rows.map(({ title, position, requiredprofile }) => {
-      return { title, position, requiredprofile };
-    });
+    if (rows.length == 0 || rows[0].title == '') {
+      return noJobDetailTemplate;
+    }
 
-    return jobDetail;
+    const jobDetail = _.map(
+      rows,
+      ({ title, location, position, requiredprofile }) => {
+        return { title, location, position, requiredprofile };
+      }
+    );
+
+    return jobDetailTemplate(jobDetail[0]);
   }
 }
 

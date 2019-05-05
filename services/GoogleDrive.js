@@ -139,7 +139,6 @@ class GoogleDrive {
   async submitCandidature() {}
 
   constructButtons(constructedUrl, jobId, jobTitle, forModification) {
-    console.log(forModification);
     const buttons = [];
     buttons.push({
       type: 'web_url',

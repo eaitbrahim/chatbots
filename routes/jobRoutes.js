@@ -35,7 +35,6 @@ module.exports = app => {
       res.set('Content-Type', 'text/html');
       res.send(jobDetail);
     } catch (err) {
-      console.log('error: ', err);
       res.status(422).send(err);
     }
   });

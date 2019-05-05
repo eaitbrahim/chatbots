@@ -3,7 +3,6 @@ const keys = require('../config/keys');
 
 module.exports = app => {
   app.get('/api/checkCandidature/:messengerId/:jobId', async (req, res) => {
-    console.log(req.params);
     const googleDrive = new GoogleDrive(keys.candidaturesSheetId);
     try {
       const candidature = await googleDrive.checkCandidature(

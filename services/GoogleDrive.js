@@ -115,7 +115,7 @@ class GoogleDrive {
         'Vous nous avez déjà envoyé votre CV. Souhaitez-vous modifier votre candidature?';
     } else {
       alreadyAppliedForTheJob.messages[0].text = `Vous avez déjà postulé à ce poste: ${
-        filteredRows.title
+        filteredRows[0].title
       }. Souhaitez-vous modifier votre candidature?`;
     }
 

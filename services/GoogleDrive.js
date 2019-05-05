@@ -170,9 +170,10 @@ class GoogleDrive {
       msg = 'Votre candidature a été mise à jour dans notre base de données.';
     }
 
+    console.log('msg:', msg);
     return {
       set_attributes: {
-        gSheetMsg: 'some value'
+        gSheetMsg: msg
       }
     };
   }

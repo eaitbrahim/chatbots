@@ -136,6 +136,8 @@ class GoogleDrive {
     return alreadyAppliedForTheJob;
   }
 
+  async submitCandidature() {}
+
   constructButtons(constructedUrl, jobId, jobTitle, forModification) {
     console.log(forModification);
     const buttons = [];

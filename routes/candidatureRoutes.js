@@ -14,4 +14,15 @@ module.exports = app => {
       res.status(422).send(err);
     }
   });
+
+  app.post('/api/candidature', async (req, res) => {
+    const googleDrive = new GoogleDrive(keys.candidaturesSheetId);
+    console.log(req.body);
+    try {
+      const candidature = await googleDrive.submitCandidature({ ...req.body });
+      res.json(candidature);
+    } catch (err) {
+      res.status(422).send(err);
+    }
+  });
 };

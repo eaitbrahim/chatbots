@@ -17,7 +17,8 @@ class GoogleDrive {
   async setSheet() {
     await promisify(this.doc.useServiceAccountAuth)(creds);
     const sheetInfo = await promisify(this.doc.getInfo)();
-    this.sheet = sheetInfo.worksheets[0];
+    console.log('set sheet');
+    return sheetInfo.worksheets[0];
   }
 
   async getJobs(fullWebApiUrl, forModification = false) {
@@ -25,8 +26,8 @@ class GoogleDrive {
       query: 'publish = yes',
       offset: 1
     };
-    await this.setSheet();
-    const rows = await promisify(this.sheet.getRows)(queryObj);
+    const sheet = await this.setSheet();
+    const rows = await promisify(sheet.getRows)(queryObj);
 
     if (rows.length == 0) {
       return noJobs;
@@ -62,8 +63,8 @@ class GoogleDrive {
       offset: 1,
       limit: 1
     };
-    await this.setSheet();
-    const rows = await promisify(this.sheet.getRows)(queryObj);
+    const sheet = await this.setSheet();
+    const rows = await promisify(sheet.getRows)(queryObj);
 
     if (rows.length == 0 || rows[0].title == '') {
       return noJobDetailTemplate;
@@ -80,9 +81,9 @@ class GoogleDrive {
   }
 
   async checkCandidature(messengerId, jobId) {
-    const filteredRows = await fetchCandidature(messengerId, jobId);
+    const candidature = await this.fetchCandidature(messengerId, jobId);
 
-    if (filteredRows.length == 0) {
+    if (candidature.length == 0) {
       if (jobId == 1) {
         return neverAppliedToUnkownJob;
       }
@@ -94,43 +95,43 @@ class GoogleDrive {
         'Vous nous avez déjà envoyé votre CV. Souhaitez-vous modifier votre candidature?';
     } else {
       alreadyAppliedForTheJob.messages[0].text = `Vous avez déjà postulé à ce poste: ${
-        filteredRows[0].jobtitle
+        candidature[0].jobtitle
       }. Souhaitez-vous modifier votre candidature?`;
     }
 
     alreadyAppliedForTheJob.messages[0].quick_replies[0].set_attributes = {
-      email: filteredRows[0].email,
-      phone: filteredRows[0].phone,
-      experience: filteredRows[0].yearsofexperience,
-      same_experience: filteredRows[0].similarexperience,
-      worked_in_majorel: filteredRows[0].workedatmajorel,
-      city: filteredRows[0].location,
-      english: filteredRows[0].englishlevel,
-      irish: filteredRows[0].dutchlevel,
-      spanish: filteredRows[0].spanishlevel,
-      italian: filteredRows[0].italianlevel,
-      german: filteredRows[0].germanlevel,
-      language1: filteredRows[0].language1,
-      language1_level: filteredRows[0].language1level,
-      language2: filteredRows[0].language2,
-      language2_level: filteredRows[0].language2level,
-      language3: filteredRows[0].language3,
-      language3_level: filteredRows[0].language3level,
-      cv: filteredRows[0].cv,
-      motivations: filteredRows[0].motivations,
-      expectations: filteredRows[0].expectations,
-      journey: filteredRows[0].journey,
-      job: filteredRows[0].jobid,
-      job_title: filteredRows[0].jobtitle,
-      first_name: filteredRows[0].firstname,
-      last_name: filteredRows[0].lastname
+      email: candidature[0].email,
+      phone: candidature[0].phone,
+      experience: candidature[0].yearsofexperience,
+      same_experience: candidature[0].similarexperience,
+      worked_in_majorel: candidature[0].workedatmajorel,
+      city: candidature[0].location,
+      english: candidature[0].englishlevel,
+      irish: candidature[0].dutchlevel,
+      spanish: candidature[0].spanishlevel,
+      italian: candidature[0].italianlevel,
+      german: candidature[0].germanlevel,
+      language1: candidature[0].language1,
+      language1_level: candidature[0].language1level,
+      language2: candidature[0].language2,
+      language2_level: candidature[0].language2level,
+      language3: candidature[0].language3,
+      language3_level: candidature[0].language3level,
+      cv: candidature[0].cv,
+      motivations: candidature[0].motivations,
+      expectations: candidature[0].expectations,
+      journey: candidature[0].journey,
+      job: candidature[0].jobid,
+      job_title: candidature[0].jobtitle,
+      first_name: candidature[0].firstname,
+      last_name: candidature[0].lastname
     };
 
     return alreadyAppliedForTheJob;
   }
 
   async submitCandidature(candidature) {
-    const candidature = await fetchCandidature(messengerId, jobId);
+    const candidature = await this.fetchCandidature(messengerId, jobId);
     const row = {
       messengerId: candidature['messenger user id'],
       email: candidature.email,
@@ -160,17 +161,16 @@ class GoogleDrive {
       lastname: candidature.last_name
     };
 
-    await this.setSheet();
+    const sheet = await this.setSheet();
     const msg = '';
     if (candidature.length == 0) {
-      await promisify(this.sheet.addRow)(row);
+      await promisify(sheet.addRow)(row);
       msg = 'Votre candidature a été ajoutée à notre base de données.';
     } else {
-      await promisify(this.sheet.updateRow)(row);
+      await promisify(sheet.updateRow)(row);
       msg = 'Votre candidature a été mise à jour dans notre base de données.';
     }
 
-    console.log('msg:', msg);
     return {
       set_attributes: {
         gSheetMsg: msg
@@ -183,8 +183,8 @@ class GoogleDrive {
       query: `messengerid = ${messengerId}`,
       offset: 1
     };
-    await this.setSheet();
-    const rows = await promisify(this.sheet.getRows)(queryObj);
+    const sheet = await this.setSheet();
+    const rows = await promisify(sheet.getRows)(queryObj);
     const filteredRows = _.filter(rows, ({ jobid }) => {
       return jobid == jobId;
     });

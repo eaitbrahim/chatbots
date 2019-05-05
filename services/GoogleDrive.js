@@ -132,7 +132,10 @@ class GoogleDrive {
 
   async submitCandidature(candidature) {
     console.log({ ...candidature });
-    const fetchedCandidature = await this.fetchCandidature(messengerId, jobId);
+    const fetchedCandidature = await this.fetchCandidature(
+      candidature['messenger user id'],
+      candidature['job']
+    );
     const row = {
       messengerId: candidature['messenger user id'],
       email: candidature.email,

@@ -5,7 +5,10 @@ module.exports = app => {
   app.get('/api/jobs', async (req, res) => {
     const googleDrive = new GoogleDrive(keys.jobsSheetId);
     try {
-      const fullWebApiUrl = `${req.protocol}://${req.get('host')}`;
+      const host = req.get('host');
+      const fullWebApiUrl = `${
+        host != 'localhost' ? 'https' : req.protocol
+      }://${host}`;
       const jobs = await googleDrive.getJobs(fullWebApiUrl);
       res.set('Content-Type', 'application/json');
       res.send(jobs);

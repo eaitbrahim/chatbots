@@ -4,6 +4,12 @@ const keys = require('./config/keys');
 
 const app = express();
 
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+);
+
 app.use(bodyParser.json());
 
 app.all('*', function(req, res, next) {

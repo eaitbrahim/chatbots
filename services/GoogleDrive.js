@@ -36,7 +36,7 @@ class GoogleDrive {
     const jobs = _.chain(rows)
       .orderBy(['date'], ['desc'])
       .take(10)
-      .map(rows, ({ id, title, date, location, imageurl }) => {
+      .map(({ id, title, date, location, imageurl }) => {
         const buttons = [];
         buttons.push({
           type: 'web_url',

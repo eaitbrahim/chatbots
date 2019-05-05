@@ -131,7 +131,8 @@ class GoogleDrive {
   }
 
   async submitCandidature(candidature) {
-    const candidature = await this.fetchCandidature(messengerId, jobId);
+    console.log({ ...candidature });
+    const fetchedCandidature = await this.fetchCandidature(messengerId, jobId);
     const row = {
       messengerId: candidature['messenger user id'],
       email: candidature.email,
@@ -161,7 +162,7 @@ class GoogleDrive {
       lastname: candidature.last_name
     };
 
-    if (candidature.length == 0) {
+    if (fetchedCandidature.length == 0) {
       await promisify(this.sheet.addRow)(row);
       console.log('inserted');
       candidatureMsg.messages.text =

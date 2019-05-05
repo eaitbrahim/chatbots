@@ -135,6 +135,7 @@ class GoogleDrive {
       candidature['messenger user id'],
       candidature['job']
     );
+    console.log(this.fetchCandidature[0]);
     const row = {
       messengerId: candidature['messenger user id'],
       email: candidature.email,
@@ -170,7 +171,7 @@ class GoogleDrive {
       candidatureMsg.messages[0].text =
         'Votre candidature a été ajoutée à notre base de données.';
     } else {
-      await promisify(this.sheet.updateRow)(row);
+      await promisify(this.sheet.addRow)({fetchedCandidature[0].row_number: row});
       candidatureMsg.messages[0].text =
         'Votre candidature a été mise à jour dans notre base de données.';
     }

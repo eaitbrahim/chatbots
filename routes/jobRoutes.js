@@ -10,8 +10,7 @@ module.exports = app => {
         host != 'localhost' ? 'https' : req.protocol
       }://${host}`;
       const jobs = await googleDrive.getJobs(fullWebApiUrl);
-      res.set('Content-Type', 'application/json');
-      res.send(jobs);
+      res.json(jobs);
     } catch (err) {
       res.status(422).send(err);
     }

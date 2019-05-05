@@ -137,6 +137,7 @@ class GoogleDrive {
   }
 
   constructButtons(constructedUrl, jobId, jobTitle, forModification) {
+    console.log(forModification);
     const buttons = [];
     buttons.push({
       type: 'web_url',
@@ -145,7 +146,7 @@ class GoogleDrive {
       messenger_extensions: true,
       webview_height_ration: 'full'
     });
-    if (forModification) {
+    if (!forModification) {
       buttons.push({
         type: 'show_block',
         set_attributes: {

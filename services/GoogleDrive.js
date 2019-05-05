@@ -7,6 +7,7 @@ const jobsGallery = require('./jsonResponses/jobsGallery.json');
 const neverAppliedToUnkownJob = require('./jsonResponses/neverAppliedToUnkownJob.json');
 const neverAppliedToKownJob = require('./jsonResponses/neverAppliedToKownJob.json');
 const alreadyAppliedForTheJob = require('./jsonResponses/alreadyAppliedForTheJob.json');
+const candidatureMsg = require('./jsonResponses/candidatureMsg.json');
 const jobDetailTemplate = require('./htmlResponses/jobDetailTemplate');
 
 class GoogleDrive {
@@ -17,8 +18,7 @@ class GoogleDrive {
   async setSheet() {
     await promisify(this.doc.useServiceAccountAuth)(creds);
     const sheetInfo = await promisify(this.doc.getInfo)();
-    console.log('set sheet');
-    return sheetInfo.worksheets[0];
+    this.sheet = sheetInfo.worksheets[0];
   }
 
   async getJobs(fullWebApiUrl, forModification = false) {
@@ -26,8 +26,8 @@ class GoogleDrive {
       query: 'publish = yes',
       offset: 1
     };
-    const sheet = await this.setSheet();
-    const rows = await promisify(sheet.getRows)(queryObj);
+    await this.setSheet();
+    const rows = await promisify(this.sheet.getRows)(queryObj);
 
     if (rows.length == 0) {
       return noJobs;
@@ -63,8 +63,8 @@ class GoogleDrive {
       offset: 1,
       limit: 1
     };
-    const sheet = await this.setSheet();
-    const rows = await promisify(sheet.getRows)(queryObj);
+    await this.setSheet();
+    const rows = await promisify(this.sheet.getRows)(queryObj);
 
     if (rows.length == 0 || rows[0].title == '') {
       return noJobDetailTemplate;
@@ -161,21 +161,17 @@ class GoogleDrive {
       lastname: candidature.last_name
     };
 
-    const sheet = await this.setSheet();
-    const msg = '';
     if (candidature.length == 0) {
-      await promisify(sheet.addRow)(row);
-      msg = 'Votre candidature a été ajoutée à notre base de données.';
+      await promisify(this.sheet.addRow)(row);
+      candidatureMsg.set_attributes.gSheetMsg =
+        'Votre candidature a été ajoutée à notre base de données.';
     } else {
-      await promisify(sheet.updateRow)(row);
-      msg = 'Votre candidature a été mise à jour dans notre base de données.';
+      await promisify(this.sheet.updateRow)(row);
+      candidatureMsg.set_attributes.gSheetMsg =
+        'Votre candidature a été mise à jour dans notre base de données.';
     }
 
-    return {
-      set_attributes: {
-        gSheetMsg: msg
-      }
-    };
+    return candidatureMsg;
   }
 
   async fetchCandidature(messengerId, jobId) {
@@ -183,8 +179,8 @@ class GoogleDrive {
       query: `messengerid = ${messengerId}`,
       offset: 1
     };
-    const sheet = await this.setSheet();
-    const rows = await promisify(sheet.getRows)(queryObj);
+    await this.setSheet();
+    const rows = await promisify(this.sheet.getRows)(queryObj);
     const filteredRows = _.filter(rows, ({ jobid }) => {
       return jobid == jobId;
     });

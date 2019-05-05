@@ -131,7 +131,6 @@ class GoogleDrive {
   }
 
   async submitCandidature(candidature) {
-    console.log({ ...candidature });
     const fetchedCandidature = await this.fetchCandidature(
       candidature['messenger user id'],
       candidature['job']
@@ -162,18 +161,17 @@ class GoogleDrive {
       jobid: candidature.job,
       jobtitle: candidature.job_title,
       firstname: candidature.first_name,
-      lastname: candidature.last_name
+      lastname: candidature.last_name,
+      submissiondate: Date
     };
 
     if (fetchedCandidature.length == 0) {
       await promisify(this.sheet.addRow)(row);
-      console.log('inserted');
-      candidatureMsg.messages.text =
+      candidatureMsg.messages[0].text =
         'Votre candidature a été ajoutée à notre base de données.';
     } else {
       await promisify(this.sheet.updateRow)(row);
-      console.log('updated');
-      candidatureMsg.messages.text =
+      candidatureMsg.messages[0].text =
         'Votre candidature a été mise à jour dans notre base de données.';
     }
 

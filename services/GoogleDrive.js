@@ -166,15 +166,15 @@ class GoogleDrive {
       submissiondate: Date
     };
 
-    if (fetchedCandidature.length == 0) {
-      await promisify(this.sheet.addRow)(row);
-      candidatureMsg.messages[0].text =
-        'Votre candidature a été ajoutée à notre base de données.';
-    } else {
-      await promisify(this.sheet.addRow)({fetchedCandidature[0].row_number: row});
+    candidatureMsg.messages[0].text =
+      'Votre candidature a été ajoutée à notre base de données.';
+    if (fetchedCandidature.length != 0) {
       candidatureMsg.messages[0].text =
         'Votre candidature a été mise à jour dans notre base de données.';
+      fetchedCandidature[0].del();
     }
+
+    await promisify(this.sheet.addRow)(row);
 
     return candidatureMsg;
   }

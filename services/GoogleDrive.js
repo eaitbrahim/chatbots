@@ -135,7 +135,7 @@ class GoogleDrive {
       candidature['messenger user id'],
       candidature['job']
     );
-    console.log(this.fetchCandidature[0]);
+
     const row = {
       messengerId: candidature['messenger user id'],
       email: candidature.email,
@@ -163,7 +163,7 @@ class GoogleDrive {
       jobtitle: candidature.job_title,
       firstname: candidature.first_name,
       lastname: candidature.last_name,
-      submissiondate: Date
+      submissiondate: Date.now()
     };
 
     candidatureMsg.messages[0].text =
@@ -171,9 +171,7 @@ class GoogleDrive {
     if (fetchedCandidature.length != 0) {
       candidatureMsg.messages[0].text =
         'Votre candidature a été mise à jour dans notre base de données.';
-      console.log('delete');
       fetchedCandidature[0].del();
-      console.log('deleted');
     }
 
     await promisify(this.sheet.addRow)(row);

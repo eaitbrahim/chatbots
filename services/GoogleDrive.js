@@ -171,7 +171,9 @@ class GoogleDrive {
     if (fetchedCandidature.length != 0) {
       candidatureMsg.messages[0].text =
         'Votre candidature a été mise à jour dans notre base de données.';
+      console.log('delete');
       fetchedCandidature[0].del();
+      console.log('deleted');
     }
 
     await promisify(this.sheet.addRow)(row);

@@ -163,7 +163,7 @@ class GoogleDrive {
       jobtitle: candidature.job_title,
       firstname: candidature.first_name,
       lastname: candidature.last_name,
-      submissiondate: Date.now()
+      submissiondate: new Date().toString()
     };
 
     candidatureMsg.messages[0].text =

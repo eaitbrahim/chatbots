@@ -186,7 +186,8 @@ class GoogleDrive {
     );
 
     if (ratingDoesExist) {
-      return redirectToBlocks.redirect_to_blocks.push('Main Menu');
+      redirectToBlocks.redirect_to_blocks = ['Main Menu'];
+      return redirectToBlocks;
     }
 
     const row = {
@@ -203,10 +204,12 @@ class GoogleDrive {
 
   async checkRatingExistence(messengerId) {
     if (await this.ratingAlreadySubmitted(messengerId)) {
-      return redirectToBlocks.redirect_to_blocks.push('Main Menu');
+      redirectToBlocks.redirect_to_blocks = ['Main Menu'];
+    } else {
+      redirectToBlocks.redirect_to_blocks = ['Feedback Form'];
     }
 
-    return redirectToBlocks.redirect_to_blocks.push('Feedback Form');
+    return redirectToBlocks;
   }
 
   async ratingAlreadySubmitted(messengerId) {

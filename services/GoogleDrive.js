@@ -183,7 +183,11 @@ class GoogleDrive {
   }
 
   async submitRating(rating) {
-    // if (await this.ratingAlreadySubmitted(rating['messenger user id'])) {
+    const ratingDoesExist = await this.ratingAlreadySubmitted(
+      rating['messenger user id']
+    );
+
+    // if (ratingDoesExist) {
     //   return redirectToBlocks.redirect_to_blocks.push('Main Menu');
     // }
 

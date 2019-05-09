@@ -208,7 +208,7 @@ class GoogleDrive {
     } else {
       redirectToBlocks.redirect_to_blocks = ['Feedback Form'];
     }
-
+    console.log(redirectToBlocks);
     return redirectToBlocks;
   }
 

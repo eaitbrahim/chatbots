@@ -6,6 +6,7 @@ const noJobs = require('./jsonResponses/noJobs.json');
 const jobsGallery = require('./jsonResponses/jobsGallery.json');
 const neverAppliedToUnkownJob = require('./jsonResponses/neverAppliedToUnkownJob.json');
 const neverAppliedToKownJob = require('./jsonResponses/neverAppliedToKownJob.json');
+const redirectToBlocks = require('./jsonResponses/redirectToBlocks.json');
 const alreadyAppliedForTheJob = require('./jsonResponses/alreadyAppliedForTheJob.json');
 const candidatureMsg = require('./jsonResponses/candidatureMsg.json');
 const jobDetailTemplate = require('./htmlResponses/jobDetailTemplate');
@@ -15,10 +16,10 @@ class GoogleDrive {
     this.doc = new GoogleSpreadsheet(spreadsheetKey);
   }
 
-  async setSheet() {
+  async setSheet(worksheet = 0) {
     await promisify(this.doc.useServiceAccountAuth)(creds);
     const sheetInfo = await promisify(this.doc.getInfo)();
-    this.sheet = sheetInfo.worksheets[0];
+    this.sheet = sheetInfo.worksheets[worksheet];
   }
 
   async getJobs(fullWebApiUrl, forModification = false) {
@@ -179,6 +180,42 @@ class GoogleDrive {
     await promisify(this.sheet.addRow)(row);
 
     return candidatureMsg;
+  }
+
+  async submitRating(rating) {
+    if (await ratingAlreadySubmitted(rating['messenger user id'])) {
+      return redirectToBlocks.redirect_to_blocks.push('Main Menu');
+    }
+
+    const row = {
+      messengerId: rating['messenger user id'],
+      firstname: rating.first_name,
+      lastname: rating.last_name,
+      rating: rating.rating_experience,
+      reason: rating.reason_reason,
+      submissiondate: new Date().toString()
+    };
+
+    await promisify(this.sheet.addRow)(row);
+  }
+
+  async checkRatingExistence(messengerId) {
+    if (await ratingAlreadySubmitted(messengerId)) {
+      return redirectToBlocks.redirect_to_blocks.push('Main Menu');
+    }
+
+    return redirectToBlocks.redirect_to_blocks.push('Feedback Form');
+  }
+
+  async ratingAlreadySubmitted(messengerId) {
+    const queryObj = {
+      query: `messengerid = ${messengerId}`,
+      offset: 1
+    };
+    await this.setSheet(1);
+    const rows = await promisify(this.sheet.getRows)(queryObj);
+
+    return rows.length > 0 || false;
   }
 
   async fetchCandidature(messengerId, jobId) {

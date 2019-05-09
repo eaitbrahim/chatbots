@@ -183,16 +183,16 @@ class GoogleDrive {
   }
 
   async submitRating(rating) {
-    if (await this.ratingAlreadySubmitted(rating['messenger user id'])) {
-      return redirectToBlocks.redirect_to_blocks.push('Main Menu');
-    }
+    // if (await this.ratingAlreadySubmitted(rating['messenger user id'])) {
+    //   return redirectToBlocks.redirect_to_blocks.push('Main Menu');
+    // }
 
     const row = {
       messengerId: rating['messenger user id'],
       firstname: rating.first_name,
       lastname: rating.last_name,
       rating: rating.rating_experience,
-      reason: rating.reason_reason,
+      reason: rating.rating_reason,
       submissiondate: new Date().toString()
     };
 

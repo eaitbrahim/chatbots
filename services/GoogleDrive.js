@@ -203,12 +203,13 @@ class GoogleDrive {
   }
 
   async checkRatingExistence(messengerId) {
-    if (await this.ratingAlreadySubmitted(messengerId)) {
+    const result = await this.ratingAlreadySubmitted(messengerId);
+    if (result) {
       redirectToBlocks.redirect_to_blocks = ['Main Menu'];
     } else {
       redirectToBlocks.redirect_to_blocks = ['Feedback Form'];
     }
-    console.log(redirectToBlocks);
+    console.log('redirectToBlocks', redirectToBlocks);
     return redirectToBlocks;
   }
 

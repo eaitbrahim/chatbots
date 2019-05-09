@@ -2,13 +2,10 @@ const _ = require('lodash');
 const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
 const creds = require('../config/client_secret.json');
-const noJobs = require('./jsonResponses/noJobs.json');
+const messages = require('./jsonResponses/messages.json');
 const jobsGallery = require('./jsonResponses/jobsGallery.json');
-const neverAppliedToUnkownJob = require('./jsonResponses/neverAppliedToUnkownJob.json');
-const neverAppliedToKownJob = require('./jsonResponses/neverAppliedToKownJob.json');
 const redirectToBlocks = require('./jsonResponses/redirectToBlocks.json');
 const alreadyAppliedForTheJob = require('./jsonResponses/alreadyAppliedForTheJob.json');
-const candidatureMsg = require('./jsonResponses/candidatureMsg.json');
 const jobDetailTemplate = require('./htmlResponses/jobDetailTemplate');
 
 class GoogleDrive {
@@ -31,7 +28,8 @@ class GoogleDrive {
     const rows = await promisify(this.sheet.getRows)(queryObj);
 
     if (rows.length == 0) {
-      return noJobs;
+      return (messages.messages[0].text =
+        "Désolé, pas d'emplois disponibles pour le moment! S'il vous plaît revenir plus tard.");
     }
     const jobs = _.chain(rows)
       .orderBy(['date'], ['desc'])
@@ -86,9 +84,9 @@ class GoogleDrive {
 
     if (candidature.length == 0) {
       if (jobId == 1) {
-        return neverAppliedToUnkownJob;
+        return redirectToBlocks.redirect_to_blocks.push('Unkown Job');
       }
-      return neverAppliedToKownJob;
+      return redirectToBlocks.redirect_to_blocks.push('Known Job');
     }
 
     if (jobId == 1) {
@@ -169,17 +167,17 @@ class GoogleDrive {
       submissiondate: new Date().toString()
     };
 
-    candidatureMsg.messages[0].text =
+    messages.messages[0].text =
       'Votre candidature a été ajoutée à notre base de données.';
     if (fetchedCandidature.length != 0) {
-      candidatureMsg.messages[0].text =
+      messages.messages[0].text =
         'Votre candidature a été mise à jour dans notre base de données.';
       fetchedCandidature[0].del();
     }
 
     await promisify(this.sheet.addRow)(row);
 
-    return candidatureMsg;
+    return messages;
   }
 
   async submitRating(rating) {
@@ -187,9 +185,9 @@ class GoogleDrive {
       rating['messenger user id']
     );
 
-    // if (ratingDoesExist) {
-    //   return redirectToBlocks.redirect_to_blocks.push('Main Menu');
-    // }
+    if (ratingDoesExist) {
+      return redirectToBlocks.redirect_to_blocks.push('Main Menu');
+    }
 
     const row = {
       messengerId: rating['messenger user id'],

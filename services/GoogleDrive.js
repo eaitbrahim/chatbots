@@ -183,7 +183,7 @@ class GoogleDrive {
   }
 
   async submitRating(rating) {
-    if (await ratingAlreadySubmitted(rating['messenger user id'])) {
+    if (await this.ratingAlreadySubmitted(rating['messenger user id'])) {
       return redirectToBlocks.redirect_to_blocks.push('Main Menu');
     }
 
@@ -200,7 +200,7 @@ class GoogleDrive {
   }
 
   async checkRatingExistence(messengerId) {
-    if (await ratingAlreadySubmitted(messengerId)) {
+    if (await this.ratingAlreadySubmitted(messengerId)) {
       return redirectToBlocks.redirect_to_blocks.push('Main Menu');
     }
 

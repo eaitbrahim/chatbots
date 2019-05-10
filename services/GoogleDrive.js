@@ -81,14 +81,14 @@ class GoogleDrive {
 
   async checkCandidature(messengerId, jobId) {
     const candidature = await this.fetchCandidature(messengerId, jobId);
-
+    console.log('candidature.length: ', candidature.length);
     if (candidature.length == 0) {
       if (jobId == 1) {
         redirectToBlocks.redirect_to_blocks = ['Unkown Job'];
       } else {
         redirectToBlocks.redirect_to_blocks = ['Known Job'];
       }
-
+      console.log('redirectToBlocks:', redirectToBlocks);
       return redirectToBlocks;
     }
 
@@ -238,6 +238,7 @@ class GoogleDrive {
     filteredRows = _.filter(rows, ({ jobid }) => {
       return jobid == jobId;
     });
+    console.log('filteredRows: ', filteredRows);
     return filteredRows;
   }
 

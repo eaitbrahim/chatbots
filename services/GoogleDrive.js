@@ -83,7 +83,9 @@ class GoogleDrive {
 
   async checkCandidature(messengerId, jobId, jobTitle) {
     const candidatureData = await this.fetchCandidature(messengerId, jobId);
+    console.log('fetch candidatures');
     if (candidatureData.allCandidatures.length == 0) {
+      console.log('all candidatures = 0');
       if (jobId == 1) {
         redirectToBlocks.redirect_to_blocks = ['Unknown Job'];
       } else {
@@ -92,7 +94,9 @@ class GoogleDrive {
 
       return redirectToBlocks;
     } else {
+      console.log('all candidatures > 0');
       if (candidatureData.foundCandidture.length == 1) {
+        console.log('found candidature');
         if (jobId == 1) {
           alreadyAppliedForTheJob.messages[0].text =
             'Vous nous avez déjà envoyé votre CV. Souhaitez-vous modifier votre candidature?';
@@ -105,7 +109,7 @@ class GoogleDrive {
           candidatureData.foundCandidture[0]
         );
       } else {
-        console.log('Propuse last candidature');
+        console.log('Not found candidature');
         const lastCandidature = _.last(candidatureData.allCandidatures);
         lastCandidature.jobid = jobId;
         lastCandidature.jobtitle = jobTitle;
@@ -113,7 +117,12 @@ class GoogleDrive {
 
         this.constructAttributesForAlreadyAppliedJob(lastCandidature);
         alreadyAppliedForTheJob.messages[0].text = `Nous avons récupéré votre dernière candidature. Voulez-vous l'utiliser pour postuler à: ${jobTitle}?`;
-
+        alreadyAppliedForTheJob.messages[0].quick_replies[0].title = 'Utiliser';
+        alreadyAppliedForTheJob.messages[0].quick_replies[1].title =
+          'Ne pas utiliser';
+        alreadyAppliedForTheJob.messages[0].quick_replies[1].block_names = [
+          'Known Job'
+        ];
         console.log('alreadyAppliedForTheJob: ', alreadyAppliedForTheJob);
       }
     }
@@ -150,13 +159,6 @@ class GoogleDrive {
       first_name: candidature.firstname,
       last_name: candidature.lastname
     };
-
-    alreadyAppliedForTheJob.messages[0].quick_replies[0].title = 'Utiliser';
-    alreadyAppliedForTheJob.messages[0].quick_replies[1].title =
-      'Ne pas utiliser';
-    alreadyAppliedForTheJob.messages[0].quick_replies[1].block_names = [
-      'Known Job'
-    ];
   }
 
   async submitCandidature(candidature) {

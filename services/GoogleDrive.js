@@ -84,9 +84,12 @@ class GoogleDrive {
 
     if (candidature.length == 0) {
       if (jobId == 1) {
-        return redirectToBlocks.redirect_to_blocks.push('Unkown Job');
+        redirectToBlocks.redirect_to_blocks = ['Unkown Job'];
+      } else {
+        redirectToBlocks.redirect_to_blocks = ['Known Job'];
       }
-      return redirectToBlocks.redirect_to_blocks.push('Known Job');
+
+      return redirectToBlocks;
     }
 
     if (jobId == 1) {
@@ -209,7 +212,7 @@ class GoogleDrive {
     } else {
       redirectToBlocks.redirect_to_blocks = ['Feedback Form'];
     }
-    console.log('redirectToBlocks', redirectToBlocks);
+
     return redirectToBlocks;
   }
 

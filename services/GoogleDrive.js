@@ -20,11 +20,12 @@ class GoogleDrive {
   }
 
   async getJobs(fullWebApiUrl, forModification = false) {
+    await this.setSheet();
+
     const queryObj = {
       query: 'publish = yes',
       offset: 1
     };
-    await this.setSheet();
     const rows = await promisify(this.sheet.getRows)(queryObj);
 
     if (rows.length == 0) {
@@ -57,12 +58,13 @@ class GoogleDrive {
   }
 
   async getJobDetail(jobId) {
+    await this.setSheet();
+
     const queryObj = {
       query: `id = ${jobId}`,
       offset: 1,
       limit: 1
     };
-    await this.setSheet();
     const rows = await promisify(this.sheet.getRows)(queryObj);
 
     if (rows.length == 0 || rows[0].title == '') {
@@ -81,14 +83,13 @@ class GoogleDrive {
 
   async checkCandidature(messengerId, jobId) {
     const candidature = await this.fetchCandidature(messengerId, jobId);
-    console.log('candidature.length: ', candidature.length);
     if (candidature.length == 0) {
       if (jobId == 1) {
         redirectToBlocks.redirect_to_blocks = ['Unkown Job'];
       } else {
         redirectToBlocks.redirect_to_blocks = ['Known Job'];
       }
-      console.log('redirectToBlocks:', redirectToBlocks);
+
       return redirectToBlocks;
     }
 
@@ -228,17 +229,24 @@ class GoogleDrive {
   }
 
   async fetchCandidature(messengerId, jobId) {
+    await this.setSheet();
+
+    const filteredRows = [];
     const queryObj = {
       query: `messengerid = ${messengerId}`,
       offset: 1
     };
-    await this.setSheet();
-    const rows = await promisify(this.sheet.getRows)(queryObj);
-    const filteredRows = [];
-    filteredRows = _.filter(rows, ({ jobid }) => {
-      return jobid == jobId;
-    });
-    console.log('filteredRows: ', filteredRows);
+    try {
+      const rows = await promisify(this.sheet.getRows)(queryObj);
+      if (rows.length > 0) {
+        filteredRows = _.filter(rows, ({ jobid }) => {
+          return jobid == jobId;
+        });
+      }
+    } catch (err) {
+      console.log('error:', err);
+    }
+    console.log('filteredRows', filteredRows);
     return filteredRows;
   }
 

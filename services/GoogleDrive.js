@@ -81,9 +81,9 @@ class GoogleDrive {
     return jobDetailTemplate(jobDetail[0]);
   }
 
-  async checkCandidature(messengerId, jobId) {
-    const candidature = await this.fetchCandidature(messengerId, jobId);
-    if (candidature.length == 0) {
+  async checkCandidature(messengerId, jobId, jobTitle) {
+    const candidatureData = await this.fetchCandidature(messengerId, jobId);
+    if (candidatureData.allCandidatures.length == 0) {
       if (jobId == 1) {
         redirectToBlocks.redirect_to_blocks = ['Unknown Job'];
       } else {
@@ -91,51 +91,71 @@ class GoogleDrive {
       }
 
       return redirectToBlocks;
-    }
-
-    if (jobId == 1) {
-      alreadyAppliedForTheJob.messages[0].text =
-        'Vous nous avez déjà envoyé votre CV. Souhaitez-vous modifier votre candidature?';
     } else {
-      alreadyAppliedForTheJob.messages[0].text = `Vous avez déjà postulé à ce poste: ${
-        candidature[0].jobtitle
-      }. Souhaitez-vous modifier votre candidature?`;
+      if (candidatureData.foundCandidture.length == 1) {
+        if (jobId == 1) {
+          alreadyAppliedForTheJob.messages[0].text =
+            'Vous nous avez déjà envoyé votre CV. Souhaitez-vous modifier votre candidature?';
+        } else {
+          alreadyAppliedForTheJob.messages[0].text = `Vous avez déjà postulé à ce poste: ${
+            candidatureData.foundCandidture[0].jobtitle
+          }. Souhaitez-vous modifier votre candidature?`;
+        }
+        this.constructAlreadyAppliedForTheJob(
+          candidatureData.foundCandidture[0]
+        );
+      } else {
+        const lastCandidature = _.last(candidatureData.allCandidatures);
+        lastCandidature.jobid = jobId;
+        lastCandidature.jobtitle = jobTitle;
+        this.constructAttributesForAlreadyAppliedJob(lastCandidature);
+        alreadyAppliedForTheJob.messages[0].text = `Nous avons récupéré votre dernière candidature. Voulez-vous l'utiliser pour postuler à: ${jobTitle}?`;
+      }
     }
-
-    alreadyAppliedForTheJob.messages[0].quick_replies[0].set_attributes = {
-      email: candidature[0].email,
-      phone: candidature[0].phone,
-      experience: candidature[0].yearsofexperience,
-      same_experience: candidature[0].similarexperience,
-      worked_in_majorel: candidature[0].workedatmajorel,
-      city_of_residence: candidature[0].city,
-      country_of_residence: candidature[0].country,
-      english: candidature[0].englishlevel,
-      irish: candidature[0].dutchlevel,
-      spanish: candidature[0].spanishlevel,
-      italian: candidature[0].italianlevel,
-      german: candidature[0].germanlevel,
-      language1: candidature[0].language1,
-      language1_level: candidature[0].language1level,
-      language2: candidature[0].language2,
-      language2_level: candidature[0].language2level,
-      language3: candidature[0].language3,
-      language3_level: candidature[0].language3level,
-      cv: candidature[0].cv,
-      motivations: candidature[0].motivations,
-      expectations: candidature[0].expectations,
-      journey: candidature[0].journey,
-      job: candidature[0].jobid,
-      job_title: candidature[0].jobtitle,
-      first_name: candidature[0].firstname,
-      last_name: candidature[0].lastname
-    };
 
     return alreadyAppliedForTheJob;
   }
 
+  constructAttributesForAlreadyAppliedJob(candidature) {
+    alreadyAppliedForTheJob.messages[0].quick_replies[0].set_attributes = {
+      email: candidature.email,
+      phone: candidature.phone,
+      experience: candidature.yearsofexperience,
+      same_experience: candidature.similarexperience,
+      worked_in_majorel: candidature.workedatmajorel,
+      city_of_residence: candidature.city,
+      country_of_residence: candidature.country,
+      english: candidature.englishlevel,
+      irish: candidature.dutchlevel,
+      spanish: candidature.spanishlevel,
+      italian: candidature.italianlevel,
+      german: candidature.germanlevel,
+      language1: candidature.language1,
+      language1_level: candidature.language1level,
+      language2: candidature.language2,
+      language2_level: candidature.language2level,
+      language3: candidature.language3,
+      language3_level: candidature.language3level,
+      cv: candidature.cv,
+      motivations: candidature.motivations,
+      expectations: candidature.expectations,
+      journey: candidature.journey,
+      job: candidature.jobid,
+      job_title: candidature.jobtitle,
+      first_name: candidature.firstname,
+      last_name: candidature.lastname
+    };
+
+    alreadyAppliedForTheJob.messages[0].quick_replies[0].title = 'Utiliser';
+    alreadyAppliedForTheJob.messages[0].quick_replies[1].title =
+      'Ne pas utiliser';
+    alreadyAppliedForTheJob.messages[0].quick_replies[1].block_names = [
+      'Known Job'
+    ];
+  }
+
   async submitCandidature(candidature) {
-    const fetchedCandidature = await this.fetchCandidature(
+    const dataCandidature = await this.fetchCandidature(
       candidature['messenger user id'],
       candidature['job']
     );
@@ -173,7 +193,7 @@ class GoogleDrive {
 
     messages.messages[0].text =
       'Votre candidature a été ajoutée à notre base de données.';
-    if (fetchedCandidature.length != 0) {
+    if (candidatureData.foundCandidture[0].length != 0) {
       messages.messages[0].text =
         'Votre candidature a été mise à jour dans notre base de données.';
       fetchedCandidature[0].del();
@@ -233,6 +253,7 @@ class GoogleDrive {
 
     const queryObj = {
       query: `messengerid = ${messengerId}`,
+      orderBy: 'submissiondate',
       offset: 1
     };
     try {
@@ -241,7 +262,7 @@ class GoogleDrive {
         return jobid == jobId;
       });
 
-      return filteredRows;
+      return { allCandidatures: rows, foundCandidture: filteredRows };
     } catch (err) {
       console.log('error:', err);
     }

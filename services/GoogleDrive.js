@@ -234,7 +234,8 @@ class GoogleDrive {
     };
     await this.setSheet();
     const rows = await promisify(this.sheet.getRows)(queryObj);
-    const filteredRows = _.filter(rows, ({ jobid }) => {
+    const filteredRows = [];
+    filteredRows = _.filter(rows, ({ jobid }) => {
       return jobid == jobId;
     });
     return filteredRows;

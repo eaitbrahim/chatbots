@@ -82,7 +82,6 @@ class GoogleDrive {
   }
 
   async checkCandidature(messengerId, jobId, jobTitle) {
-    console.log(messengerId, jobId, jobTitle);
     const candidatureData = await this.fetchCandidature(messengerId, jobId);
     if (candidatureData.allCandidatures.length == 0) {
       if (jobId == 1) {
@@ -109,6 +108,8 @@ class GoogleDrive {
         const lastCandidature = _.last(candidatureData.allCandidatures);
         lastCandidature.jobid = jobId;
         lastCandidature.jobtitle = jobTitle;
+        console.log('lastCandidature job id:', astCandidature.jobid);
+
         this.constructAttributesForAlreadyAppliedJob(lastCandidature);
         alreadyAppliedForTheJob.messages[0].text = `Nous avons récupéré votre dernière candidature. Voulez-vous l'utiliser pour postuler à: ${jobTitle}?`;
 

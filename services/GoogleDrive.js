@@ -246,7 +246,6 @@ class GoogleDrive {
     } catch (err) {
       console.log('error:', err);
     }
-    console.log('filteredRows', filteredRows);
     return filteredRows;
   }
 

@@ -93,7 +93,6 @@ class GoogleDrive {
       return redirectToBlocks;
     } else {
       if (candidatureData.foundCandidture.length == 1) {
-        console.log('found candidature');
         if (jobId == 1) {
           alreadyAppliedForTheJob.messages[0].text =
             'Vous nous avez déjà envoyé votre CV. Souhaitez-vous modifier votre candidature?';
@@ -102,16 +101,13 @@ class GoogleDrive {
             candidatureData.foundCandidture[0].jobtitle
           }. Souhaitez-vous modifier votre candidature?`;
         }
-        console.log('found: ', candidatureData.foundCandidture[0]);
-        this.constructAlreadyAppliedForTheJob(
+        this.constructAttributesForAlreadyAppliedJob(
           candidatureData.foundCandidture[0]
         );
       } else {
-        console.log('Not found candidature');
         const lastCandidature = _.last(candidatureData.allCandidatures);
         lastCandidature.jobid = jobId;
         lastCandidature.jobtitle = jobTitle;
-        console.log('lastCandidature job id:', astCandidature.jobid);
 
         this.constructAttributesForAlreadyAppliedJob(lastCandidature);
         alreadyAppliedForTheJob.messages[0].text = `Nous avons récupéré votre dernière candidature. Voulez-vous l'utiliser pour postuler à: ${jobTitle}?`;
@@ -121,7 +117,6 @@ class GoogleDrive {
         alreadyAppliedForTheJob.messages[0].quick_replies[1].block_names = [
           'Known Job'
         ];
-        console.log('alreadyAppliedForTheJob: ', alreadyAppliedForTheJob);
       }
     }
 

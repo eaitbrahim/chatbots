@@ -231,22 +231,20 @@ class GoogleDrive {
   async fetchCandidature(messengerId, jobId) {
     await this.setSheet();
 
-    const filteredRows = [];
     const queryObj = {
       query: `messengerid = ${messengerId}`,
       offset: 1
     };
     try {
       const rows = await promisify(this.sheet.getRows)(queryObj);
-      if (rows.length > 0) {
-        filteredRows = _.filter(rows, ({ jobid }) => {
-          return jobid == jobId;
-        });
-      }
+      const filteredRows = _.filter(rows, ({ jobid }) => {
+        return jobid == jobId;
+      });
+
+      return filteredRows;
     } catch (err) {
       console.log('error:', err);
     }
-    return filteredRows;
   }
 
   constructButtons(constructedUrl, jobId, jobTitle, forModification) {

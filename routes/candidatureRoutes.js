@@ -9,7 +9,7 @@ module.exports = app => {
         req.params.messengerId,
         req.params.jobId
       );
-      console.log('candidature:', candidature);
+
       res.json(candidature);
     } catch (err) {
       res.status(422).send(err);

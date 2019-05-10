@@ -85,7 +85,7 @@ class GoogleDrive {
     const candidature = await this.fetchCandidature(messengerId, jobId);
     if (candidature.length == 0) {
       if (jobId == 1) {
-        redirectToBlocks.redirect_to_blocks = ['Unkown Job'];
+        redirectToBlocks.redirect_to_blocks = ['Unknown Job'];
       } else {
         redirectToBlocks.redirect_to_blocks = ['Known Job'];
       }

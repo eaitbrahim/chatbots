@@ -105,6 +105,7 @@ class GoogleDrive {
           candidatureData.foundCandidture[0]
         );
       } else {
+        console.log('Propuse last candidature');
         const lastCandidature = _.last(candidatureData.allCandidatures);
         lastCandidature.jobid = jobId;
         lastCandidature.jobtitle = jobTitle;

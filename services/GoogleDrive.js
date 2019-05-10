@@ -82,6 +82,7 @@ class GoogleDrive {
   }
 
   async checkCandidature(messengerId, jobId, jobTitle) {
+    console.log(messengerId, jobId, jobTitle);
     const candidatureData = await this.fetchCandidature(messengerId, jobId);
     if (candidatureData.allCandidatures.length == 0) {
       if (jobId == 1) {

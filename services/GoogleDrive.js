@@ -111,6 +111,8 @@ class GoogleDrive {
         lastCandidature.jobtitle = jobTitle;
         this.constructAttributesForAlreadyAppliedJob(lastCandidature);
         alreadyAppliedForTheJob.messages[0].text = `Nous avons récupéré votre dernière candidature. Voulez-vous l'utiliser pour postuler à: ${jobTitle}?`;
+
+        console.log('alreadyAppliedForTheJob: ', alreadyAppliedForTheJob);
       }
     }
 

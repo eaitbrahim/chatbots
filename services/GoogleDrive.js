@@ -83,9 +83,7 @@ class GoogleDrive {
 
   async checkCandidature(messengerId, jobId, jobTitle) {
     const candidatureData = await this.fetchCandidature(messengerId, jobId);
-    console.log('fetch candidatures');
     if (candidatureData.allCandidatures.length == 0) {
-      console.log('all candidatures = 0');
       if (jobId == 1) {
         redirectToBlocks.redirect_to_blocks = ['Unknown Job'];
       } else {
@@ -94,7 +92,6 @@ class GoogleDrive {
 
       return redirectToBlocks;
     } else {
-      console.log('all candidatures > 0');
       if (candidatureData.foundCandidture.length == 1) {
         console.log('found candidature');
         if (jobId == 1) {
@@ -105,6 +102,7 @@ class GoogleDrive {
             candidatureData.foundCandidture[0].jobtitle
           }. Souhaitez-vous modifier votre candidature?`;
         }
+        console.log('found: ', candidatureData.foundCandidture[0]);
         this.constructAlreadyAppliedForTheJob(
           candidatureData.foundCandidture[0]
         );

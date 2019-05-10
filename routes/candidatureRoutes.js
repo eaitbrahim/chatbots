@@ -5,6 +5,7 @@ module.exports = app => {
   app.post('/api/checkCandidature', async (req, res) => {
     const googleDrive = new GoogleDrive(keys.candidaturesSheetId);
     try {
+      console.log('body:', req.body);
       const { messengerId, jobId, jobTitle } = { ...req.body };
       const candidature = await googleDrive.checkCandidature(
         messengerId,

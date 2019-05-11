@@ -189,7 +189,7 @@ class GoogleDrive {
     messages.messages[0].text =
       'Votre candidature a été ajoutée à notre base de données.';
 
-    const dataCandidature = await this.fetchCandidature(
+    const candidatureData = await this.fetchCandidature(
       candidature['messenger user id'],
       candidature['job']
     );

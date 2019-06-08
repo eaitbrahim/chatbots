@@ -35,6 +35,7 @@ async function processWhatsappData(data) {
 
   if (data.queryResult.intent.displayName === 'Check Status') {
     var ticketNumber = data.queryResult.parameters['number'];
+    console.log('Received ticket number:', ticketNumber);
     result = await consultTicket(ticketNumber, phonenumber);
   }
   return result;
@@ -97,6 +98,9 @@ async function createTicket(ticket) {
     ]);
   } catch (err) {
     console.log('Error: ', err);
+    response.fulfillmentText = formatResponse([
+      stripIndent`⛔️ *Impossible de créer votre ticket pour le moment! Veuillez réessayer plus tard.*`
+    ]);
   }
 
   return response;
@@ -114,7 +118,9 @@ async function consultTicket(ticketNumber, phoneNumber) {
         response.fulfillmentText = formatResponse([
           stripIndent`
                                               *Numéro de ticket: ${ticketNumber}*.
-                                            👤Crée par: ${requester.name}.
+                                            👤Crée par: ${
+                                              result.requester.name
+                                            }.
                                             🛠 Sujet de ticket: ${
                                               result.subject
                                             }. 

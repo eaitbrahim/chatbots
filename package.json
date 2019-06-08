@@ -14,6 +14,8 @@
   "author": "Elmehdi Aitbrahim",
   "license": "ISC",
   "dependencies": {
+    "common-tags": "*",
+    "twilio": "*",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "google-spreadsheet": "^2.0.7",

@@ -305,6 +305,98 @@ class GoogleDrive {
     }
     return buttons;
   }
+
+  async getTicketStatusByPhonenumber(phoneNumber) {
+    await this.setSheet();
+    var tickets = [];
+    const queryObj = {
+      query: `phonenumber = ${phoneNumber.replace('+', '').trim()}`,
+      offset: 1
+    };
+    try {
+      const rows = await promisify(this.sheet.getRows)(queryObj);
+      if (rows.length == 0) {
+        tickets.push({
+          text: {
+            text: [
+              [
+                `Aucun ticket associé au numéro de téléphone :${phoneNumber}`,
+                "Que puis-je faire pour vous: créer un nouveau ticket ou bien consulter le statut d'un ticket existant?"
+              ].join('\n---\n')
+            ]
+          }
+        });
+      } else {
+        var fulfillementText = _.chain(rows)
+          .orderBy(['date'], ['desc'])
+          .take(3)
+          .map(({ subject, number, status }) => {
+            return stripIndent`
+                                    *Numéro de ticket: ${number}*
+                                    🛠 ${subject}
+                                    🔖 Status: ${status}
+                                `;
+          })
+          .push(
+            "Que puis-je faire pour vous: créer un nouveau ticket ou bien consulter le statut d'un ticket existant?"
+          )
+          .join('\n---\n')
+          .value();
+
+        tickets.push({ text: { text: [fulfillementText] } });
+      }
+    } catch (err) {
+      console.log('err:', err);
+    }
+    return tickets;
+  }
+
+  async getTicketStatus(ticketNumber) {
+    await this.setSheet();
+
+    const queryObj = {
+      query: `number = ${ticketNumber}`,
+      offset: 1,
+      limit: 1
+    };
+    const rows = await promisify(this.sheet.getRows)(queryObj);
+
+    if (rows.length == 0) {
+      return {};
+    }
+
+    const ticketDetail = _.map(rows, ({ subject, fullname, status }) => {
+      return { subject, fullname, status };
+    });
+
+    return ticketDetail[0];
+  }
+
+  async getTicketDetail(ticketNumber) {
+    await this.setSheet();
+
+    const queryObj = {
+      query: `number = ${ticketNumber}`,
+      offset: 1,
+      limit: 1
+    };
+    const rows = await promisify(this.sheet.getRows)(queryObj);
+
+    if (rows.length == 0 || rows[0].title == '') {
+      return {};
+    }
+
+    const ticketDetail = _.map(rows, ({ description, fullname, status }) => {
+      return { description, fullname, status };
+    });
+
+    return ticketDetail[0];
+  }
+
+  async submitTicket(ticket) {
+    await this.setSheet();
+    await promisify(this.sheet.addRow)(ticket);
+  }
 }
 
 module.exports = GoogleDrive;

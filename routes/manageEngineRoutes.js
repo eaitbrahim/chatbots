@@ -208,7 +208,7 @@ async function consultByPhoneNumber(phoneNumber) {
       }
     });
   } catch (err) {
-    consule.log('err: ', err);
+    console.log('err: ', err);
   }
   return result;
 }

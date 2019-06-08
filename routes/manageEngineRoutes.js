@@ -15,6 +15,7 @@ module.exports = app => {
 };
 
 async function processWhatsappData(data) {
+  var result = {};
   var phonenumber = data.originalDetectIntentRequest.payload.data.From.split(
     ':'
   )[1];
@@ -33,9 +34,10 @@ async function processWhatsappData(data) {
   }
 
   if (data.queryResult.intent.displayName === 'Check Status') {
-    var ticketNumber = data.queryResult.queryText;
+    var ticketNumber = data.queryResult.parameters['number'];
     result = await consultTicket(ticketNumber, phonenumber);
   }
+  return result;
 }
 
 function processTicketChanges({
@@ -102,17 +104,23 @@ async function createTicket(ticket) {
 
 async function consultTicket(ticketNumber, phoneNumber) {
   try {
-    var result = {};
+    var result = null;
     var response = { fulfillmentText: ' ', fulfillmentMessages: [] };
     if (ticketNumber != 'undefined' && ticketNumber != '') {
+      console.log('Consult by ticket number');
       result = await consultByTicketNumber(ticketNumber);
-      if (result != {}) {
+      console.log('result:', result);
+      if (result != null) {
         response.fulfillmentText = formatResponse([
           stripIndent`
                                               *Numéro de ticket: ${ticketNumber}*.
                                             👤Crée par: ${requester.name}.
-                                            🛠 Sujet de ticket: ${subject}. 
-                                            🔖 Actuel Statut: ${status.name}. 
+                                            🛠 Sujet de ticket: ${
+                                              result.subject
+                                            }. 
+                                            🔖 Actuel Statut: ${
+                                              result.status.name
+                                            }. 
                                               `
         ]);
       } else {
@@ -123,9 +131,10 @@ async function consultTicket(ticketNumber, phoneNumber) {
         ]);
       }
     } else {
+      console.log('consult by phone number');
       result = await consultByPhoneNumber(phoneNumber);
       var tickets = [];
-      if (result == {}) {
+      if (result == null) {
         tickets.push({
           text: {
             text: [
@@ -167,7 +176,6 @@ async function consultTicket(ticketNumber, phoneNumber) {
 }
 
 async function consultByTicketNumber(ticketNumber) {
-  var result = {};
   try {
     var requestDetail = await axios.get(
       `${keys.manageEngineUrl}/${ticketNumber}`,
@@ -179,17 +187,16 @@ async function consultByTicketNumber(ticketNumber) {
       }
     );
 
-    result = requestDetail.data.request;
+    return requestDetail.data.request;
   } catch (err) {
     console.log('err: ', err);
+    return null;
   }
-  return result;
 }
 
 async function consultByPhoneNumber(phoneNumber) {
-  var result = {};
   try {
-    result = await axios.get(`${keys.manageEngineUrl}`, {
+    return await axios.get(`${keys.manageEngineUrl}`, {
       headers: {
         Authorization: `${keys.manageEngineAuthToken}`,
         Accept: 'application/vnd.manageengine.sdp.v3+json'
@@ -209,8 +216,8 @@ async function consultByPhoneNumber(phoneNumber) {
     });
   } catch (err) {
     console.log('err: ', err);
+    return null;
   }
-  return result;
 }
 
 function formatResponse(stripedIndented) {

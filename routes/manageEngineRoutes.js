@@ -102,30 +102,20 @@ async function createTicket(ticket) {
 
 async function consultTicket(ticketNumber, phoneNumber) {
   try {
-    var tickets = [];
+    var result = {};
     var response = { fulfillmentText: ' ', fulfillmentMessages: [] };
     if (ticketNumber != 'undefined' && ticketNumber != '') {
-      try {
-        var requestDetail = await axios.get(
-          `${keys.manageEngineUrl}/${ticketNumber}`,
-          {
-            headers: {
-              Authorization: `${keys.manageEngineAuthToken}`,
-              Accept: 'application/vnd.manageengine.sdp.v3+json'
-            }
-          }
-        );
-
-        var { subject, requester, status } = requestDetail.data.request;
+      result = await consultByTicketNumber(ticketNumber);
+      if (result != {}) {
         response.fulfillmentText = formatResponse([
           stripIndent`
-                                      *Numéro de ticket: ${ticketNumber}*.
-                                     👤Crée par: ${requester.name}.
-                                     🛠 Sujet de ticket: ${subject}. 
-                                     🔖 Actuel Statut: ${status.name}. 
-                                      `
+                                              *Numéro de ticket: ${ticketNumber}*.
+                                            👤Crée par: ${requester.name}.
+                                            🛠 Sujet de ticket: ${subject}. 
+                                            🔖 Actuel Statut: ${status.name}. 
+                                              `
         ]);
-      } catch (err) {
+      } else {
         response.fulfillmentText = formatResponse([
           stripIndent`
                                       *Le numéro: ${ticketNumber} n'existe pas pour un ticket.*
@@ -133,26 +123,17 @@ async function consultTicket(ticketNumber, phoneNumber) {
         ]);
       }
     } else {
-      var results = await axios.get(`${keys.manageEngineUrl}`, {
-        headers: {
-          Authorization: `${keys.manageEngineAuthToken}`,
-          Accept: 'application/vnd.manageengine.sdp.v3+json'
-        },
-        params: {
-          input_data: {
-            list_info: {
-              row_count: '3',
-              sort_field: 'created_time.display_value',
-              search_fields: {
-                'requester.phone': `${phoneNumber}`
-              },
-              sort_order: 'desc'
-            }
+      result = await consultByPhoneNumber(phoneNumber);
+      var tickets = [];
+      if (result == {}) {
+        tickets.push({
+          text: {
+            text: [
+              formatResponse([`On arrive pas à trouver un ticket pour vous.`])
+            ]
           }
-        }
-      });
-
-      if (results.data.requests.length == 0) {
+        });
+      } else if (result.data.requests.length == 0) {
         tickets.push({
           text: {
             text: [
@@ -163,7 +144,7 @@ async function consultTicket(ticketNumber, phoneNumber) {
           }
         });
       } else {
-        var fulfillementText = _.chain(results.data.requests)
+        var fulfillementText = _.chain(result.data.requests)
           .map(({ subject, id, status }) => {
             return stripIndent`
                                                     *Numéro de ticket: ${id}*
@@ -183,6 +164,53 @@ async function consultTicket(ticketNumber, phoneNumber) {
   } catch (err) {
     console.log('Error: ', err);
   }
+}
+
+async function consultByTicketNumber(ticketNumber) {
+  var result = {};
+  try {
+    var requestDetail = await axios.get(
+      `${keys.manageEngineUrl}/${ticketNumber}`,
+      {
+        headers: {
+          Authorization: `${keys.manageEngineAuthToken}`,
+          Accept: 'application/vnd.manageengine.sdp.v3+json'
+        }
+      }
+    );
+
+    result = requestDetail.data.request;
+  } catch (err) {
+    console.log('err: ', err);
+  }
+  return result;
+}
+
+async function consultByPhoneNumber(phoneNumber) {
+  var result = {};
+  try {
+    result = await axios.get(`${keys.manageEngineUrl}`, {
+      headers: {
+        Authorization: `${keys.manageEngineAuthToken}`,
+        Accept: 'application/vnd.manageengine.sdp.v3+json'
+      },
+      params: {
+        input_data: {
+          list_info: {
+            row_count: '3',
+            sort_field: 'created_time.display_value',
+            search_fields: {
+              'requester.phone': `${phoneNumber}`
+            },
+            sort_order: 'desc'
+          }
+        }
+      }
+    });
+  } catch (err) {
+    consule.log('err: ', err);
+  }
+  return result;
 }
 
 function formatResponse(stripedIndented) {

@@ -6,67 +6,63 @@ const keys = require('../config/keys');
 module.exports = app => {
   app.post('/api/requests', async (req, res) => {
     if (typeof req.body.originalDetectIntentRequest !== 'undefined') {
-      var intent = req.body.queryResult.intent.displayName;
-      var result = await processWhatsappData();
-      var phonenumber = req.body.originalDetectIntentRequest.payload.data.From.split(
-        ':'
-      )[1];
-
-      if (
-        req.body.queryResult.intent.displayName === 'UserProvidesDescription'
-      ) {
-        var firstName =
-          req.body.queryResult.outputContexts[0].parameters['given-name'];
-        var lastName =
-          req.body.queryResult.outputContexts[0].parameters['last-name'];
-        var subject =
-          req.body.queryResult.outputContexts[0].parameters['ticket-subject'];
-        var description =
-          req.body.queryResult.outputContexts[0].parameters[
-            'ticket-description'
-          ];
-
-        result = await createTicket({
-          phonenumber,
-          firstName,
-          lastName,
-          subject,
-          description
-        });
-      }
-
-      if (req.body.queryResult.intent.displayName === 'Check Status') {
-        var ticketNumber = req.body.queryResult.queryText;
-        result = await consultTicket(ticketNumber, phonenumber);
-      }
-
+      var result = await processWhatsappData(req.body);
       res.json(result);
     } else {
-      try {
-        const { Number, Full_name, Phone_Number, Subject, Status } = req.body;
-        const message = `Hi ${Full_name}, the status of ticket number ${Number} (${Subject}) has been changed to ${Status}`;
-        const twilioClient = require('twilio')(
-          keys.twilioAccountSid,
-          keys.twilioAuthToken
-        );
-        console.log(`whatsapp:+${Phone_Number}`);
-        twilioClient.messages
-          .create({
-            from: 'whatsapp:+14155238886',
-            body: message,
-            to: `whatsapp:+${Phone_Number}`
-          })
-          .then(message => console.log(message.sid));
-      } catch (err) {
-        console.log('err:', err);
-      }
+      processTicketChanges(req.body);
     }
   });
 };
 
-function processWhatsappData() {}
+async function processWhatsappData(data) {
+  var phonenumber = data.originalDetectIntentRequest.payload.data.From.split(
+    ':'
+  )[1];
 
-function processTicketChanges() {}
+  if (data.queryResult.intent.displayName === 'UserProvidesDescription') {
+    var newTicket = {
+      phonenumber,
+      firstName: data.queryResult.outputContexts[0].parameters['given-name'],
+      lastName: data.queryResult.outputContexts[0].parameters['last-name'],
+      subject: data.queryResult.outputContexts[0].parameters['ticket-subject'],
+      description:
+        data.queryResult.outputContexts[0].parameters['ticket-description']
+    };
+
+    result = await createTicket(newTicket);
+  }
+
+  if (data.queryResult.intent.displayName === 'Check Status') {
+    var ticketNumber = data.queryResult.queryText;
+    result = await consultTicket(ticketNumber, phonenumber);
+  }
+}
+
+function processTicketChanges({
+  Number,
+  Full_name,
+  Phone_Number,
+  Subject,
+  Status
+} = {}) {
+  try {
+    const message = `Hi ${Full_name}, the status of ticket number ${Number} (${Subject}) has been changed to ${Status}`;
+    const twilioClient = require('twilio')(
+      keys.twilioAccountSid,
+      keys.twilioAuthToken
+    );
+    console.log(`whatsapp:+${Phone_Number}`);
+    twilioClient.messages
+      .create({
+        from: 'whatsapp:+14155238886',
+        body: message,
+        to: `whatsapp:+${Phone_Number}`
+      })
+      .then(message => console.log(message.sid));
+  } catch (err) {
+    console.log('err:', err);
+  }
+}
 
 async function createTicket(ticket) {
   var response = { fulfillmentText: '' };

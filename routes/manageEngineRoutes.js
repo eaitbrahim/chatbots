@@ -67,16 +67,22 @@ function processTicketChanges({
   }
 }
 
-async function createTicket(ticket) {
+async function createTicket({
+  phonenumber,
+  firstName,
+  lastName,
+  subject,
+  description
+} = {}) {
   var response = { fulfillmentText: '' };
-  var { phonenumber, firstName, lastName, subject, description } = ticket;
-
-  try {
-    var newRequest = await axios.post(`${keys.manageEngineUrl}`, {
-      headers: {
-        Authorization: `${keys.manageEngineAuthToken}`,
-        Accept: 'application/vnd.manageengine.sdp.v3+json'
-      },
+  const options = {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded',
+      Authorization: `${keys.manageEngineAuthToken}`,
+      Accept: 'application/vnd.manageengine.sdp.v3+json'
+    },
+    params: {
       input_data: {
         request: {
           subject,
@@ -87,7 +93,11 @@ async function createTicket(ticket) {
           }
         }
       }
-    });
+    },
+    url: `${keys.manageEngineUrl}`
+  };
+  try {
+    var newRequest = await axios(options);
 
     response.fulfillmentText = formatResponse([
       stripIndent`

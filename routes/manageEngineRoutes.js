@@ -43,7 +43,7 @@ async function processWhatsappData(data) {
 
 function processTicketChanges({
   Number,
-  Full_name,
+  Full_Full_namename,
   Phone_Number,
   Subject,
   Status

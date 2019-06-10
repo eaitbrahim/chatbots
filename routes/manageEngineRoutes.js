@@ -5,6 +5,7 @@ const keys = require('../config/keys');
 
 module.exports = app => {
   app.post('/api/requests', async (req, res) => {
+    console.log('req: ', typeof req.body.originalDetectIntentRequest);
     if (typeof req.body.originalDetectIntentRequest !== 'undefined') {
       var result = await processWhatsappData(req.body);
       res.json(result);
@@ -43,23 +44,32 @@ async function processWhatsappData(data) {
 
 function processTicketChanges({
   Number,
-  Full_Full_namename,
-  Phone_Number,
+  Full_name,
+  Phone_number,
   Subject,
   Status
 } = {}) {
   try {
+    console.log('received data from webhook:', {
+      Number,
+      Full_name,
+      Phone_number,
+      Subject,
+      Status
+    });
     const message = `Hi ${Full_name}, the status of ticket number ${Number} (${Subject}) has been changed to ${Status}`;
     const twilioClient = require('twilio')(
       keys.twilioAccountSid,
       keys.twilioAuthToken
     );
-    console.log(`whatsapp:+${Phone_Number}`);
+    var phoneNumberArr = Phone_number.split('+');
     twilioClient.messages
       .create({
         from: 'whatsapp:+14155238886',
         body: message,
-        to: `whatsapp:+${Phone_Number}`
+        to: `whatsapp:+${
+          phoneNumberArr.length > 1 ? phoneNumberArr[1] : Phone_number
+        }`
       })
       .then(message => console.log(message.sid));
   } catch (err) {
@@ -102,9 +112,10 @@ async function createTicket({
     response.fulfillmentText = formatResponse([
       stripIndent`
                                         🛠 Votre ticket a été créé avec succès. 
-                                        * Son numéro de ticket est ${
+                                        *Son numéro de ticket est ${
                                           newRequest.data.request.id
-                                        }*`
+                                        }*
+                                        `
     ]);
   } catch (err) {
     console.log('Error: ', err);

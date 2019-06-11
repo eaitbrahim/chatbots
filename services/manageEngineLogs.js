@@ -26,6 +26,27 @@ class ManageEngineLog {
 
     await promisify(this.sheet.addRow)(row);
   }
+
+  async getFullname(phonenumber) {
+    const queryObj = {
+      query: `phonenumber = ${phonenumber.replace(
+        '+',
+        ''
+      )} and action = Create`,
+      offset: 1,
+      limit: 1
+    };
+    console.log('queryObj: ', queryObj);
+    var fullname = null;
+    await this.setSheet();
+    var rows = await promisify(this.sheet.getRows)(queryObj);
+
+    if (rows.length > 0) {
+      fullname = rows[0].fullname;
+      console.log('Found name:', fullname);
+    }
+    return fullname;
+  }
 }
 
 module.exports = ManageEngineLog;

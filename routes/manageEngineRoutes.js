@@ -39,9 +39,9 @@ async function processWhatsappData(data) {
   }
 
   if (data.queryResult.intent.displayName === 'Check Status') {
-    var ticketNumber = data.queryResult.parameters['number'];
-    console.log('Received ticket number:', ticketNumber);
-    result = await consultTicket(ticketNumber, phonenumber);
+    var numberOfTickets = data.queryResult.parameters['number'];
+    console.log('number of tickets requested:', numberOfTickets);
+    result = await consultTicket(phonenumber, numberOfTickets);
   }
   return result;
 }
@@ -142,37 +142,19 @@ async function createTicket({
   return response;
 }
 
-async function consultTicket(ticketNumber, phoneNumber) {
+async function consultTicket(phoneNumber, numberOfTickets = 3) {
   try {
     var result = null;
     var response = { fulfillmentText: ' ', fulfillmentMessages: [] };
-    // if (ticketNumber != 'undefined' && ticketNumber != '') {
-    //   console.log('Consult by ticket number');
-    //   result = await consultByTicketNumber(ticketNumber);
-    //   if (result != null) {
-    //     response.fulfillmentText = formatResponse([
-    //       stripIndent`
-    //                                           *Numéro de ticket: ${ticketNumber}*.
-    //                                         👤Crée par: ${
-    //                                           result.requester.name
-    //                                         }.
-    //                                         🛠 Sujet de ticket: ${
-    //                                           result.subject
-    //                                         }.
-    //                                         🔖 Actuel Statut: ${
-    //                                           result.status.name
-    //                                         }.
-    //                                           `
-    //     ]);
+    if (numberOfTickets != 'undefined' && numberOfTickets != '') {
+      if (numberOfTickets > 10) {
+        numberOfTickets = 10;
+      }
+    }
 
-    //     return response;
-    //   }
-    // }
-
-    console.log('Consult by phone number:', phoneNumber);
-    result = await consultByPhoneNumber(phoneNumber);
+    var requesterFullname = await getRequesterFullname(phoneNumber);
     var tickets = [];
-    if (result == null) {
+    if (requesterFullname == null) {
       var text = {
         text: {
           text: [
@@ -182,36 +164,43 @@ async function consultTicket(ticketNumber, phoneNumber) {
       };
       tickets.push(text);
       logData(phoneNumber, 'Consult', '', JSON.stringify(text));
-    } else if (result.data.requests.length == 0) {
-      var text = {
-        text: {
-          text: [
-            formatResponse([
-              `Aucun ticket associé au numéro de téléphone :${phoneNumber}`
-            ])
-          ]
-        }
-      };
-      tickets.push(text);
-      logData(phoneNumber, 'Consult', '', JSON.stringify(text));
     } else {
-      var fulfillementText = _.chain(result.data.requests)
-        .map(({ subject, id, status, requester }) => {
-          logData(
-            phoneNumber,
-            'Consult',
-            requester.name,
-            JSON.stringify({ subject, id, status })
-          );
-          return stripIndent`
-                                                    *Numéro de ticket: ${id}*
-                                                    🛠 ${subject}
-                                                    🔖 Status: ${status.name}
-                                                `;
-        })
-        .value();
+      console.log('consult by fullname:', requesterFullname);
+      result = await consultByFullname(requesterFullname, numberOfTickets);
+      if (result == null || result.data.requests.length == 0) {
+        var text = {
+          text: {
+            text: [
+              formatResponse([
+                `Aucun ticket associé au numéro de téléphone :${phoneNumber}`
+              ])
+            ]
+          }
+        };
+        tickets.push(text);
+        logData(phoneNumber, 'Consult', '', JSON.stringify(text));
+      } else {
+        var fulfillementText = _.chain(result.data.requests)
+          .map(({ subject, id, status, requester }) => {
+            logData(
+              phoneNumber,
+              'Consult',
+              requester.name,
+              JSON.stringify({ subject, id, status, requester })
+            );
+            return stripIndent`
+                                                    *Numéro de ticket: ${id}*.
+                                                  👤Crée par: ${requester.name}.
+                                                  🛠 Sujet de ticket: ${subject}.
+                                                  🔖 Actuel Statut: ${
+                                                    status.name
+                                                  }.
+                                                    `;
+          })
+          .value();
 
-      tickets.push({ text: { text: [formatResponse(fulfillementText)] } });
+        tickets.push({ text: { text: [formatResponse(fulfillementText)] } });
+      }
     }
 
     response.fulfillmentMessages = tickets;
@@ -241,6 +230,32 @@ async function consultByTicketNumber(ticketNumber) {
   }
 }
 
+async function consultByFullname(fullname, numberOfTickets) {
+  try {
+    var options = {
+      headers: {
+        Authorization: `${keys.manageEngineAuthToken}`,
+        Accept: 'application/vnd.manageengine.sdp.v3+json'
+      },
+      params: {
+        input_data: {
+          list_info: {
+            row_count: `${numberOfTickets}`,
+            sort_field: 'created_time.display_value',
+            search_fields: {
+              'requester.name': `${fullname}`
+            },
+            sort_order: 'desc'
+          }
+        }
+      }
+    };
+    return await axios.get(`${keys.manageEngineUrl}`, options);
+  } catch (err) {
+    console.log('err: ', err);
+    return null;
+  }
+}
 async function consultByPhoneNumber(phoneNumber) {
   try {
     var options = {
@@ -266,6 +281,15 @@ async function consultByPhoneNumber(phoneNumber) {
     console.log('err: ', err);
     return null;
   }
+}
+
+async function getRequesterFullname(phonenumber) {
+  const manageEngineLog = new ManageEngineLog(keys.manageEngineLogSheetId);
+  var result = await manageEngineLog.getFullname(phonenumber);
+  console.log(
+    `full name of ${phonenumber} is ${result != null ? result : 'not found'}`
+  );
+  return result;
 }
 
 function logData(phonenumber, action, fullname = '', data = '') {

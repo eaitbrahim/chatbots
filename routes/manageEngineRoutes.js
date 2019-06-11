@@ -5,7 +5,7 @@ const keys = require('../config/keys');
 
 module.exports = app => {
   app.post('/api/requests', async (req, res) => {
-    console.log('req: ', typeof req.body.originalDetectIntentRequest);
+    console.log('Received body:', req.body);
     if (typeof req.body.originalDetectIntentRequest !== 'undefined') {
       var result = await processWhatsappData(req.body);
       res.json(result);
@@ -21,7 +21,10 @@ async function processWhatsappData(data) {
     ':'
   )[1];
 
-  if (data.queryResult.intent.displayName === 'UserProvidesDescription') {
+  if (
+    data.queryResult.intent.displayName ===
+    'UserProvidesDescription-CreateTicket'
+  ) {
     var newTicket = {
       phonenumber,
       firstName: data.queryResult.outputContexts[0].parameters['given-name'],
@@ -131,70 +134,65 @@ async function consultTicket(ticketNumber, phoneNumber) {
   try {
     var result = null;
     var response = { fulfillmentText: ' ', fulfillmentMessages: [] };
-    if (ticketNumber != 'undefined' && ticketNumber != '') {
-      console.log('Consult by ticket number');
-      result = await consultByTicketNumber(ticketNumber);
-      console.log('result:', result);
-      if (result != null) {
-        response.fulfillmentText = formatResponse([
-          stripIndent`
-                                              *Numéro de ticket: ${ticketNumber}*.
-                                            👤Crée par: ${
-                                              result.requester.name
-                                            }.
-                                            🛠 Sujet de ticket: ${
-                                              result.subject
-                                            }. 
-                                            🔖 Actuel Statut: ${
-                                              result.status.name
-                                            }. 
-                                              `
-        ]);
-      } else {
-        response.fulfillmentText = formatResponse([
-          stripIndent`
-                                      *Le numéro: ${ticketNumber} n'existe pas pour un ticket.*
-                                      `
-        ]);
-      }
+    // if (ticketNumber != 'undefined' && ticketNumber != '') {
+    //   console.log('Consult by ticket number');
+    //   result = await consultByTicketNumber(ticketNumber);
+    //   if (result != null) {
+    //     response.fulfillmentText = formatResponse([
+    //       stripIndent`
+    //                                           *Numéro de ticket: ${ticketNumber}*.
+    //                                         👤Crée par: ${
+    //                                           result.requester.name
+    //                                         }.
+    //                                         🛠 Sujet de ticket: ${
+    //                                           result.subject
+    //                                         }.
+    //                                         🔖 Actuel Statut: ${
+    //                                           result.status.name
+    //                                         }.
+    //                                           `
+    //     ]);
+
+    //     return response;
+    //   }
+    // }
+
+    console.log('Consult by phone number');
+    result = await consultByPhoneNumber(phoneNumber);
+    var tickets = [];
+    if (result == null) {
+      tickets.push({
+        text: {
+          text: [
+            formatResponse([`On arrive pas à trouver un ticket pour vous.`])
+          ]
+        }
+      });
+    } else if (result.data.requests.length == 0) {
+      tickets.push({
+        text: {
+          text: [
+            formatResponse([
+              `Aucun ticket associé au numéro de téléphone :${phoneNumber}`
+            ])
+          ]
+        }
+      });
     } else {
-      console.log('consult by phone number');
-      result = await consultByPhoneNumber(phoneNumber);
-      var tickets = [];
-      if (result == null) {
-        tickets.push({
-          text: {
-            text: [
-              formatResponse([`On arrive pas à trouver un ticket pour vous.`])
-            ]
-          }
-        });
-      } else if (result.data.requests.length == 0) {
-        tickets.push({
-          text: {
-            text: [
-              formatResponse([
-                `Aucun ticket associé au numéro de téléphone :${phoneNumber}`
-              ])
-            ]
-          }
-        });
-      } else {
-        var fulfillementText = _.chain(result.data.requests)
-          .map(({ subject, id, status }) => {
-            return stripIndent`
+      var fulfillementText = _.chain(result.data.requests)
+        .map(({ subject, id, status }) => {
+          return stripIndent`
                                                     *Numéro de ticket: ${id}*
                                                     🛠 ${subject}
                                                     🔖 Status: ${status.name}
                                                 `;
-          })
-          .value();
+        })
+        .value();
 
-        tickets.push({ text: { text: [formatResponse(fulfillementText)] } });
-      }
-
-      response.fulfillmentMessages = tickets;
+      tickets.push({ text: { text: [formatResponse(fulfillementText)] } });
     }
+
+    response.fulfillmentMessages = tickets;
 
     return response;
   } catch (err) {

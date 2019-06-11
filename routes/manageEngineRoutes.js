@@ -2,6 +2,7 @@ const _ = require('lodash');
 const { stripIndent } = require('common-tags');
 const axios = require('axios');
 const keys = require('../config/keys');
+const ManageEngineLog = require('../services/manageEngineLogs');
 
 module.exports = app => {
   app.post('/api/requests', async (req, res) => {
@@ -111,7 +112,12 @@ async function createTicket({
   };
   try {
     var newRequest = await axios(options);
-
+    logData(
+      phonenumber,
+      'Create',
+      `${firstName} ${lastName}`,
+      JSON.stringify(newRequest.data.request)
+    );
     response.fulfillmentText = formatResponse([
       stripIndent`
                                         🛠 Votre ticket a été créé avec succès. 
@@ -125,6 +131,12 @@ async function createTicket({
     response.fulfillmentText = formatResponse([
       stripIndent`⛔️ *Impossible de créer votre ticket pour le moment! Veuillez réessayer plus tard.*`
     ]);
+    logData(
+      phonenumber,
+      'Create',
+      `${firstName} ${lastName}`,
+      JSON.stringify(err)
+    );
   }
 
   return response;
@@ -157,19 +169,21 @@ async function consultTicket(ticketNumber, phoneNumber) {
     //   }
     // }
 
-    console.log('Consult by phone number');
+    console.log('Consult by phone number:', phoneNumber);
     result = await consultByPhoneNumber(phoneNumber);
     var tickets = [];
     if (result == null) {
-      tickets.push({
+      var text = {
         text: {
           text: [
             formatResponse([`On arrive pas à trouver un ticket pour vous.`])
           ]
         }
-      });
+      };
+      tickets.push(text);
+      logData(phoneNumber, 'Consult', '', JSON.stringify(text));
     } else if (result.data.requests.length == 0) {
-      tickets.push({
+      var text = {
         text: {
           text: [
             formatResponse([
@@ -177,10 +191,18 @@ async function consultTicket(ticketNumber, phoneNumber) {
             ])
           ]
         }
-      });
+      };
+      tickets.push(text);
+      logData(phoneNumber, 'Consult', '', JSON.stringify(text));
     } else {
       var fulfillementText = _.chain(result.data.requests)
-        .map(({ subject, id, status }) => {
+        .map(({ subject, id, status, requester }) => {
+          logData(
+            phoneNumber,
+            'Consult',
+            requester.name,
+            JSON.stringify({ subject, id, status })
+          );
           return stripIndent`
                                                     *Numéro de ticket: ${id}*
                                                     🛠 ${subject}
@@ -221,7 +243,7 @@ async function consultByTicketNumber(ticketNumber) {
 
 async function consultByPhoneNumber(phoneNumber) {
   try {
-    return await axios.get(`${keys.manageEngineUrl}`, {
+    var options = {
       headers: {
         Authorization: `${keys.manageEngineAuthToken}`,
         Accept: 'application/vnd.manageengine.sdp.v3+json'
@@ -238,11 +260,22 @@ async function consultByPhoneNumber(phoneNumber) {
           }
         }
       }
-    });
+    };
+    await axios.get(`${keys.manageEngineUrl}`, options);
   } catch (err) {
     console.log('err: ', err);
     return null;
   }
+}
+
+function logData(phonenumber, action, fullname = '', data = '') {
+  const manageEngineLog = new ManageEngineLog(keys.manageEngineLogSheetId);
+  manageEngineLog.submitLog({
+    fullname,
+    phonenumber,
+    action,
+    data
+  });
 }
 
 function formatResponse(stripedIndented) {

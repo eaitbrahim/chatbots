@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const GoogleSpreadsheet = require('google-spreadsheet');
 const { promisify } = require('util');
 const creds = require('../config/client_secret.json');
@@ -33,8 +34,7 @@ class ManageEngineLog {
         '+',
         ''
       )} and action = Create`,
-      offset: 1,
-      limit: 1
+      offset: 1
     };
     console.log('queryObj: ', queryObj);
     var fullname = null;
@@ -42,7 +42,16 @@ class ManageEngineLog {
     var rows = await promisify(this.sheet.getRows)(queryObj);
 
     if (rows.length > 0) {
-      fullname = rows[0].fullname;
+      fullname = _.chain(rows)
+        .orderBy(['datetimestamp'], ['desc'])
+        .take(10)
+        .map(({ fullname }) => {
+          return fullname;
+        })
+        .first()
+        .value();
+
+      //fullname = rows[0].fullname;
       console.log('Found name:', fullname);
     }
     return fullname;

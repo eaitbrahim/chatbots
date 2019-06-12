@@ -142,15 +142,17 @@ async function createTicket({
   return response;
 }
 
-async function consultTicket(phoneNumber, numberOfTickets = 3) {
+async function consultTicket(phoneNumber, numberOfTickets) {
   try {
     var result = null;
     var response = { fulfillmentText: ' ', fulfillmentMessages: [] };
-    if (numberOfTickets != 'undefined' && numberOfTickets != '') {
-      if (numberOfTickets > 10) {
-        numberOfTickets = 10;
-      }
+    if (numberOfTickets == '') {
+      numberOfTickets = 1;
     }
+    if (numberOfTickets > 10) {
+      numberOfTickets = 10;
+    }
+    console.log('Number of tickets that will be used:', numberOfTickets);
 
     var requesterFullname = await getRequesterFullname(phoneNumber);
     var tickets = [];
@@ -211,25 +213,6 @@ async function consultTicket(phoneNumber, numberOfTickets = 3) {
   }
 }
 
-async function consultByTicketNumber(ticketNumber) {
-  try {
-    var requestDetail = await axios.get(
-      `${keys.manageEngineUrl}/${ticketNumber}`,
-      {
-        headers: {
-          Authorization: `${keys.manageEngineAuthToken}`,
-          Accept: 'application/vnd.manageengine.sdp.v3+json'
-        }
-      }
-    );
-
-    return requestDetail.data.request;
-  } catch (err) {
-    console.log('err: ', err);
-    return null;
-  }
-}
-
 async function consultByFullname(fullname, numberOfTickets) {
   try {
     var options = {
@@ -251,32 +234,6 @@ async function consultByFullname(fullname, numberOfTickets) {
       }
     };
     return await axios.get(`${keys.manageEngineUrl}`, options);
-  } catch (err) {
-    console.log('err: ', err);
-    return null;
-  }
-}
-async function consultByPhoneNumber(phoneNumber) {
-  try {
-    var options = {
-      headers: {
-        Authorization: `${keys.manageEngineAuthToken}`,
-        Accept: 'application/vnd.manageengine.sdp.v3+json'
-      },
-      params: {
-        input_data: {
-          list_info: {
-            row_count: '3',
-            sort_field: 'created_time.display_value',
-            search_fields: {
-              'requester.phone': `${phoneNumber}`
-            },
-            sort_order: 'desc'
-          }
-        }
-      }
-    };
-    await axios.get(`${keys.manageEngineUrl}`, options);
   } catch (err) {
     console.log('err: ', err);
     return null;

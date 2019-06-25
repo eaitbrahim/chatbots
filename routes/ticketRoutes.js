@@ -11,9 +11,7 @@ module.exports = app => {
         ':'
       )[1];
 
-      if (
-        req.body.queryResult.intent.displayName === 'UserProvidesDescription'
-      ) {
+      if (req.body.queryResult.intent.displayName === 'CreateNewTicket') {
         var firstName =
           req.body.queryResult.outputContexts[0].parameters['given-name'];
         var lastName =

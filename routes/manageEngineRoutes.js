@@ -21,20 +21,16 @@ async function processWhatsappData(data) {
   var phonenumber = data.originalDetectIntentRequest.payload.data.From.split(
     ':'
   )[1];
-
-  if (
-    data.queryResult.intent.displayName ===
-    'UserProvidesDescription-CreateTicket'
-  ) {
+  console.log('phonenumber:', phonenumber);
+  if (data.queryResult.intent.displayName === 'CreateNewTicket') {
     var newTicket = {
       phonenumber,
-      firstName: data.queryResult.outputContexts[0].parameters['given-name'],
-      lastName: data.queryResult.outputContexts[0].parameters['last-name'],
-      subject: data.queryResult.outputContexts[0].parameters['ticket-subject'],
-      description:
-        data.queryResult.outputContexts[0].parameters['ticket-description']
+      firstName: data.queryResult.parameters['given-name'],
+      lastName: data.queryResult.parameters['last-name'],
+      subject: data.queryResult.parameters['ticket-subject'],
+      description: data.queryResult.parameters['ticket-description']
     };
-
+    console.log('newTicket:', newTicket);
     result = await createTicket(newTicket);
   }
 

@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { stripIndent } = require('common-tags');
 const axios = require('axios');
 const GoogleSheet = require('../services/GoogleSheet');
@@ -41,7 +42,12 @@ module.exports = app => {
     } else {
       try {
         const { Number, Full_name, Phone_Number, Subject, Status } = req.body;
-        const message = `Hi ${Full_name}, the status of ticket number ${Number} (${Subject}) has been changed to ${Status}`;
+        const message = stripIndent`
+                                                    *Numéro de ticket: ${Number}*.
+                                                  👤Crée par: ${Full_name}.
+                                                  🛠 Sujet de ticket: ${Subject}.
+                                                  🔖 Statut actuel: ${Status}.
+                                                    `;
         const twilioClient = require('twilio')(
           keys.twilioAccountSid,
           keys.twilioAuthToken
@@ -82,20 +88,29 @@ async function createTicket(
     };
 
     await googleSheet.submitTicket(ticket);
-    response.fulfillmentText = [
+    response.fulfillmentText = formatResponse([
       stripIndent`
-                                     🛠 Your ticket for ${
-                                       ticket.subject
-                                     }, has been created. 
-                                     🔖 It\'s current status is open. 
-                                      *Your ticket number is ${ticket.number}*`,
-      "Que puis-je faire pour vous: créer un nouveau ticket ou bien consulter le statut d'un ticket existant?"
-    ].join('\n---\n');
+                                        🛠 Votre ticket a été créé avec succès. 
+                                        *Votre numéro de ticket est ${
+                                          ticket.number
+                                        }*
+                                        `
+    ]);
 
     return response;
   } catch (err) {
     console.log('Error: ', err);
   }
+}
+
+function formatResponse(stripedIndented) {
+  var formatedResponse = '';
+  stripedIndented.push(
+    "Que puis-je faire pour vous: créer un nouveau ticket ou bien consulter le statut d'un ticket existant?"
+  );
+  formatedResponse = _.join(stripedIndented, '\n---\n');
+  console.log(formatedResponse);
+  return formatedResponse;
 }
 
 async function consultTicket(ticketNumber, phonenumber) {

@@ -14,13 +14,14 @@
   "author": "Elmehdi Aitbrahim",
   "license": "ISC",
   "dependencies": {
-    "common-tags": "*",
-    "twilio": "*",
     "body-parser": "^1.18.3",
+    "common-tags": "*",
     "express": "^4.16.4",
     "google-spreadsheet": "^2.0.7",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
-    "path-parser": "^2.0.2"
+    "path-parser": "^2.0.2",
+    "twilio": "*"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"

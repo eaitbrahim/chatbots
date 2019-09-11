@@ -5,6 +5,7 @@ const {
 const axios = require('axios');
 const keys = require('../config/keys');
 const ManageEngineLog = require('../services/manageEngineLogs');
+const jwt = require('jsonwebtoken');
 
 module.exports = app => {
   app.post('/api/requests', async (req, res) => {
@@ -23,7 +24,23 @@ module.exports = app => {
       'Message': 'Hello!'
     });
   });
+
+  app.get('/api/generateJwt', async (req, res) => {
+    let token = jwt.sign({
+      id: keys.twilioSidForApi
+    }, keys.secret, {
+      expiresIn: 2592000
+    });
+    console.log('Token:', token);
+    res.status(200).json({
+      "success": [{
+        "msg": "Token generated successfully",
+        "token": token
+      }]
+    })
+  });
 };
+
 
 async function processWhatsappData(data) {
   var result = {};

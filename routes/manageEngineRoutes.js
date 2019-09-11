@@ -6,9 +6,10 @@ const axios = require('axios');
 const keys = require('../config/keys');
 const ManageEngineLog = require('../services/manageEngineLogs');
 const jwt = require('jsonwebtoken');
+const authClientRequest = require('../middlewares/authGuard');
 
 module.exports = app => {
-  app.post('/api/requests', async (req, res) => {
+  app.post('/api/requests', authClientRequest.authClientToken, async (req, res) => {
     console.log('Received body:', req.body);
     var result = {};
     if (typeof req.body.originalDetectIntentRequest !== 'undefined') {
@@ -19,7 +20,7 @@ module.exports = app => {
     res.json(result);
   });
 
-  app.get('/api/requests', async (req, res) => {
+  app.get('/api/requests', authClientRequest.authClientToken, async (req, res) => {
     res.json({
       'Message': 'Hello!'
     });

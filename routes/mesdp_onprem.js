@@ -3,9 +3,10 @@ const {
     stripIndent
 } = require('common-tags');
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
+
 const keys = require('../config/keys');
 const ManageEngineLog = require('../services/manageEngineLogs');
-const jwt = require('jsonwebtoken');
 const authClientRequest = require('../middlewares/authGuard');
 
 module.exports = app => {

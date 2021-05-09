@@ -19,7 +19,7 @@
     "express": "^4.16.4",
     "google-spreadsheet": "^2.0.7",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "path-parser": "^2.0.2",
     "twilio": "*"
   },

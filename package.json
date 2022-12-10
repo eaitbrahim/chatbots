@@ -16,7 +16,7 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "common-tags": "*",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "google-spreadsheet": "^2.0.7",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
